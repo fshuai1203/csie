@@ -19,4 +19,6 @@ public interface StudentMapper {
     void updateById(Student student);
 
     List<StudentVO> selectStudentVoByIds(List<Integer> memberIds);
+
+    List<String> selectStudentNameByIds(List<Integer> memberIds);
 }

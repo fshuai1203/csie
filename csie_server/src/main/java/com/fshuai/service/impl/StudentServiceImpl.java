@@ -13,6 +13,7 @@ import com.fshuai.exception.PasswordEditFailedException;
 import com.fshuai.exception.RegisterFailedException;
 import com.fshuai.exception.StudentProjectException;
 import com.fshuai.mapper.StudentMapper;
+import com.fshuai.service.DepartService;
 import com.fshuai.service.StudentService;
 import com.fshuai.vo.StudentVO;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,9 @@ public class StudentServiceImpl implements StudentService {
 
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
+    DepartService departService;
 
     /**
      * 学生登陆
@@ -162,6 +166,7 @@ public class StudentServiceImpl implements StudentService {
         }
         StudentVO studentVO = StudentVO.builder().build();
         BeanUtils.copyProperties(student, studentVO);
+        studentVO.setDeptName(departService.getDepartNameById(studentVO.getDeptId()));
         return studentVO;
     }
 }

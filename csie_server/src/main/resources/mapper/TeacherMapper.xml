@@ -90,6 +90,7 @@
                t.dept_id    dept_id,
                t.major_name major_name,
                t.role       role,
+               t.phone      phone,
                d.`name`     dept_name
         FROM teacher t,
              department d

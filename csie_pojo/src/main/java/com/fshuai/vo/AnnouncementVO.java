@@ -12,10 +12,7 @@ public class AnnouncementVO {
 
     private Integer id;
     private String title;
-    private String content;
-    private String attachments;
     private LocalDate publishDate;
-    private Integer deptId;
     private String deptName;
 
 }

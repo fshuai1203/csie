@@ -57,4 +57,7 @@
             #{id}
         </foreach>
     </select>
+    <select id="selectDetailById" resultType="com.fshuai.entity.Announcement">
+        select * from announcement where id = #{id}
+    </select>
 </mapper>

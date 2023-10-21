@@ -19,4 +19,6 @@ public class AnnouncementPageQueryDTO {
     //  每页显示记录数
     private int pageSize;
 
+
+
 }

@@ -6,6 +6,7 @@ import com.fshuai.dto.AnnouncementUpdateDTO;
 import com.fshuai.result.PageResult;
 import com.fshuai.result.Result;
 import com.fshuai.service.AnnouncementService;
+import com.fshuai.vo.AnnouncementDetailVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +51,13 @@ public class AnnouncementController {
     public Result<PageResult> deleteByIds(@RequestParam List<Integer> ids) {
         announcementService.deleteBatch(ids);
         return Result.success();
+    }
+
+    @GetMapping("/detail/{id}")
+    @ApiOperation("查询公告详情")
+    public Result<AnnouncementDetailVO> getAnnouncementDetail(@PathVariable("id") Integer id) {
+        AnnouncementDetailVO announcementDetail = announcementService.detail(id);
+        return Result.success(announcementDetail);
     }
 
 }

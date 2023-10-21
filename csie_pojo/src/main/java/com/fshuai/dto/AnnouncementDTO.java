@@ -4,6 +4,7 @@ package com.fshuai.dto;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 public class AnnouncementDTO {
@@ -12,6 +13,6 @@ public class AnnouncementDTO {
 
     private String content;
 
-    private String attachments;
+    private List<String> attachments;
 
 }

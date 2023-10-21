@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.fshuai.mapper.ProjectFileMapper">
-    <insert id="insertProjectFile"  useGeneratedKeys="true" keyProperty="id" >
+    <insert id="insertProjectFile" useGeneratedKeys="true" keyProperty="id">
         insert into project_file(name, state, url)
         VALUES (#{name}, #{state}, #{url})
     </insert>
@@ -10,4 +10,10 @@
         from project_file
         where name like concat(#{name}, '%')
     </delete>
+    <select id="selectProjectFileVOByIds" resultType="com.fshuai.vo.ProjectFileVO">
+        select * from project_file where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
 </mapper>

@@ -6,21 +6,21 @@ import com.fshuai.constant.*;
 import com.fshuai.context.StudentBaseContext;
 import com.fshuai.context.TeacherBaseContext;
 import com.fshuai.dto.*;
-import com.fshuai.entity.Project;
-import com.fshuai.entity.ProjectFinance;
-import com.fshuai.entity.ProjectReview;
+import com.fshuai.entity.*;
 import com.fshuai.exception.AnnouncementNotAllowedException;
 import com.fshuai.exception.StudentProjectException;
 import com.fshuai.exception.TeacherProjectException;
 import com.fshuai.mapper.*;
 import com.fshuai.properties.JwtProperties;
 import com.fshuai.result.PageResult;
+import com.fshuai.service.DepartService;
 import com.fshuai.service.FileService;
 import com.fshuai.service.ProjectService;
 import com.fshuai.utils.IdWorker;
 import com.fshuai.utils.StringUtil;
 import com.fshuai.vo.ProjectDetailVO;
 import com.fshuai.vo.ProjectPageVO;
+import com.fshuai.vo.ProjectVO;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +57,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Autowired
     FileService fileService;
 
+    @Autowired
+    DepartService departService;
+
 
     @Autowired
     ProjectFinanceMapper projectFinanceMapper;
@@ -68,6 +72,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Autowired
     StringUtil stringUtil;
+
+    @Autowired
+    TeacherMapper teacherMapper;
 
     /**
      * 教师端查询项目
@@ -148,7 +155,11 @@ public class ProjectServiceImpl implements ProjectService {
             projectReviewMapper.updateProjectReview(projectReview);
             updateProject.setState(oldState + 2);
             if (projectReview.getAttachments() != null) {
-                updateProject.setAttachments(projectReview.getAttachments() + "," + project.getAttachments());
+                if (project.getAttachments() == null) {
+                    updateProject.setAttachments(projectReview.getAttachments());
+                } else {
+                    updateProject.setAttachments(projectReview.getAttachments() + "," + project.getAttachments());
+                }
             }
         }
         // 审核失败
@@ -237,12 +248,25 @@ public class ProjectServiceImpl implements ProjectService {
         List<Project> projects = projectMapper.selectByPrincipalId(studentID);
         // 检查学生担任组内成员的项目
         List<Integer> projectIds = projectMemberMapper.selectProjectIdsByMemberId(studentID);
-        if (projectIds.size() != 0) {
+        if (!projectIds.isEmpty()) {
             projects.addAll(projectMapper.selectByIds(projectIds));
         }
+
+        List<ProjectVO> projectVOS = new ArrayList<>();
+        for (Project project : projects) {
+            ProjectVO projectVO = new ProjectVO();
+            BeanUtils.copyProperties(project, projectVO);
+            projectVO.setDeptName(departService.getDepartNameById(project.getDeptId()));
+            projectVO.setTypeStr(stringUtil.getTypeStr(project.getType()));
+            projectVO.setStateStr(stringUtil.getStateStr(project.getState()));
+            // 补全小组成员
+            List<Integer> memberIds = projectMemberMapper.selectMemberIdsByProjectId(project.getId());
+            projectVO.setProjectMembersName(stringUtil.listTOString(studentMapper.selectStudentNameByIds(memberIds)));
+            projectVOS.add(projectVO);
+        }
         PageResult pageResult = new PageResult();
-        pageResult.setRecords(projects);
-        pageResult.setTotal(projects.size());
+        pageResult.setRecords(projectVOS);
+        pageResult.setTotal(projectVOS.size());
         return pageResult;
     }
 
@@ -295,6 +319,12 @@ public class ProjectServiceImpl implements ProjectService {
         if (category != CategoryConstant.INNOVATE && category != CategoryConstant.BUSINESS) {
             throw new StudentProjectException(MessageConstant.PROJECT_ADD_FAILED_CATEGORY_NOT_TRUE);
         }
+        // 添加教师和负责人名字
+        Teacher teacher = teacherMapper.selectById(projectApplyDTO.getTeacherId());
+        Student student = studentMapper.selectById(projectApplyDTO.getPrincipal().getId());
+        if (teacher == null || student == null) {
+            throw new StudentProjectException(MessageConstant.TEACHER_STUDENT_ID_ERROR);
+        }
         // 创建项目
         Project project = Project
                 .builder()
@@ -302,6 +332,8 @@ public class ProjectServiceImpl implements ProjectService {
                 .number(String.valueOf(idWorker.nextId()))//为项目生成一个随机编号
                 .type(TypeConstant.DEPT_TYPE) // 默认是系级项目
                 .state(ProjectStateConstant.APPROVAL_WAIT_APPLY)
+                .teacherName(teacher.getName())
+                .principalName(student.getName())
                 .build();
         BeanUtils.copyProperties(projectApplyDTO, project);
         // 添加project到project表中
@@ -324,19 +356,20 @@ public class ProjectServiceImpl implements ProjectService {
      */
     private void insertProjectReview(Project project, List<String> attachments) {
         // 将文件保存到file
-        List<Integer> ids = fileService.updateProjectFile(project, attachments);
+        String ids = fileService.insertProjectFile(project, attachments);
         // 将提交记录保存到project_review中
         ProjectReview projectReview = ProjectReview
                 .builder()
                 .projectId(project.getId())
                 .state(project.getState())
-                .attachments(stringUtil.IntListTOString(ids))
+                .attachments(ids)
                 .build();
         projectReviewMapper.insert(projectReview);
     }
 
     /**
      * 学生提交审核报告
+     * 包括延期审核或中期审核
      *
      * @param reviewApplyDTO
      */
@@ -345,13 +378,25 @@ public class ProjectServiceImpl implements ProjectService {
         // 根据项目Id检查项目状态,并检查项目负责人Id和申请人Id
         Project project = checkProjectPrincipal(reviewApplyDTO.getProjectId());
         // 检查项目状态与所提交的状态是否一致，从而确保申请人所提交材料正确
-        if (project.getState() != reviewApplyDTO.getState()) {
+        // 延期审核检查
+        if (reviewApplyDTO.getState() == ProjectStateConstant.POSTPONE_WAIT_APPLY && project.getState() == ProjectStateConstant.MIDTERM_REVIEW_SUCCEED) {
+            // 申请延期审核
+            project.setState(reviewApplyDTO.getState());
+        } else if (project.getState() == reviewApplyDTO.getState()) {
+            // 延期审核申请结项审核
+            if (project.getState() == ProjectStateConstant.POSTPONE_REVIEW_SUCCEED) {
+                project.setState(ProjectStateConstant.COMPLETION_WAIT_APPLY);
+                reviewApplyDTO.setState(ProjectStateConstant.COMPLETION_WAIT_APPLY);
+            } else {
+                // 中期审核
+                // 更新项目状态为待检查状态，并将本次提交保存到project_review中记录
+                // 更新project的state为提交材料待审核
+                project.setState(project.getState() + 1);
+                reviewApplyDTO.setState(project.getState() + 1);
+            }
+        } else {
             throw new StudentProjectException(MessageConstant.STATE_FAILED);
         }
-        // 更新项目状态为待检查状态，并将本次提交保存到project_review中记录
-        // 更新project的state为提交材料待审核
-        project.setState(project.getState() + 1);
-        reviewApplyDTO.setState(project.getState() + 1);
         insertProjectReview(project, reviewApplyDTO.getAttachments());
 
         // 更新项目表中的项目状态

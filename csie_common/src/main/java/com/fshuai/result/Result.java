@@ -18,14 +18,14 @@ public class Result<T> implements Serializable {
 
     public static <T> Result<T> success() {
         Result<T> result = new Result<T>();
-        result.code = 1;
+        result.code = 200;
         return result;
     }
 
     public static <T> Result<T> success(String msg, T object) {
         Result<T> result = new Result<T>();
         result.data = object;
-        result.code = 1;
+        result.code = 200;
         result.msg = msg;
         return result;
     }
@@ -33,13 +33,13 @@ public class Result<T> implements Serializable {
     public static <T> Result<T> success(T object) {
         Result<T> result = new Result<T>();
         result.data = object;
-        result.code = 1;
+        result.code = 200;
         return result;
     }
 
     public static <T> Result<T> success(String msg) {
         Result<T> result = new Result<T>();
-        result.code = 1;
+        result.code = 200;
         result.msg = msg;
         return result;
     }

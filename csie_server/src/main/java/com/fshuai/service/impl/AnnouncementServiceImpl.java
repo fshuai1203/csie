@@ -12,9 +12,14 @@ import com.fshuai.entity.Announcement;
 import com.fshuai.exception.AnnouncementNotAllowedException;
 import com.fshuai.exception.DeletionNotAllowedException;
 import com.fshuai.mapper.AnnouncementMapper;
+import com.fshuai.mapper.DepartMapper;
 import com.fshuai.properties.JwtProperties;
 import com.fshuai.result.PageResult;
+import com.fshuai.service.DepartService;
+import com.fshuai.service.FileService;
+import com.fshuai.vo.AnnouncementDetailVO;
 import com.fshuai.vo.AnnouncementVO;
+import com.fshuai.vo.ProjectFileVO;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +43,12 @@ public class AnnouncementServiceImpl implements com.fshuai.service.AnnouncementS
 
     @Autowired
     AnnouncementMapper announcementMapper;
+
+    @Autowired
+    FileService fileService;
+
+    @Autowired
+    DepartService departService;
 
     /**
      * @param announcementPageQueryDTO
@@ -100,6 +111,8 @@ public class AnnouncementServiceImpl implements com.fshuai.service.AnnouncementS
         if (teacherRole != RoleConstant.SCHOOL_HEAD && teacherRole != RoleConstant.DEPARTMENT_HEAD) {
             throw new AnnouncementNotAllowedException(MessageConstant.ROLE_FAILED);
         }
+        // 添加公告附件
+        String ids = fileService.insertFile(announcementDTO.getTitle(), -2, announcementDTO.getAttachments());
 
         Announcement announcement = Announcement
                 .builder()
@@ -107,9 +120,11 @@ public class AnnouncementServiceImpl implements com.fshuai.service.AnnouncementS
                 .state(StatusConstant.ENABLE)
                 .publishUser(teacherId)
                 .deptId(teacherDept)
+                .attachments(ids)
                 .build();
         BeanUtils.copyProperties(announcementDTO, announcement);
         announcementMapper.insert(announcement);
+
     }
 
     @Override
@@ -134,5 +149,18 @@ public class AnnouncementServiceImpl implements com.fshuai.service.AnnouncementS
             }
         }
         throw new DeletionNotAllowedException(MessageConstant.ROLE_FAILED);
+    }
+
+    @Override
+    public AnnouncementDetailVO detail(Integer id) {
+        Announcement announcement = announcementMapper.selectDetailById(id);
+        AnnouncementDetailVO announcementDetailVO = new AnnouncementDetailVO();
+        BeanUtils.copyProperties(announcement, announcementDetailVO);
+        announcementDetailVO.setDeptName(departService.getDepartNameById(announcement.getDeptId()));
+        if (announcement.getAttachments() != null && announcement.getAttachments() != "") {
+            List<ProjectFileVO> projectFiles = fileService.getProjectFileByIds(announcement.getAttachments());
+            announcementDetailVO.setAttachments(projectFiles);
+        }
+        return announcementDetailVO;
     }
 }

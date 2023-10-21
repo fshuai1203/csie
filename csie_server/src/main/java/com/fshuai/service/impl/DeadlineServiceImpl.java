@@ -1,6 +1,7 @@
 package com.fshuai.service.impl;
 
 import com.fshuai.constant.MessageConstant;
+import com.fshuai.constant.RedisKeyConstant;
 import com.fshuai.constant.RoleConstant;
 import com.fshuai.constant.SettingsConstant;
 import com.fshuai.context.TeacherBaseContext;
@@ -19,6 +20,8 @@ import com.github.pagehelper.Constant;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +40,9 @@ public class DeadlineServiceImpl implements DeadlineService {
 
     @Autowired
     private JwtProperties jwtProperties;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Override
     public ProjectDeadlineVO getDeadline() {
@@ -74,6 +80,7 @@ public class DeadlineServiceImpl implements DeadlineService {
                 .build();
         BeanUtils.copyProperties(projectDeadlineUpdateDTO, projectDeadline);
         deadlineMapper.update(projectDeadline);
+        updateDeadLineCache();
     }
 
     /**
@@ -82,6 +89,7 @@ public class DeadlineServiceImpl implements DeadlineService {
      * 数据库会保存上一条时间线
      * 添加时间线会在settings里面添加一个新的csi_id
      * 然后在对应csi_id,添加时间线
+     * 在redis中添加每个阶段结束的时间
      *
      * @param projectDeadlineDTO
      */
@@ -116,5 +124,27 @@ public class DeadlineServiceImpl implements DeadlineService {
         projectDeadline.setDeadlineId(deadlineId);
         BeanUtils.copyProperties(projectDeadlineDTO, projectDeadline);
         deadlineMapper.add(projectDeadline);
+        updateDeadLineCache();
+    }
+
+    /**
+     * 更新redis缓存
+     */
+    private void updateDeadLineCache() {
+        //获取时间线
+        ProjectDeadlineVO deadline = getDeadline();
+        ValueOperations valueOperations = redisTemplate.opsForValue();
+        valueOperations.set(RedisKeyConstant.APPROVAL_BEGIN_DATE, deadline.getApprovalBeginDate());
+        valueOperations.set(RedisKeyConstant.APPROVAL_END_DATE, deadline.getApprovalEndDate());
+        valueOperations.set(RedisKeyConstant.MIDTERM_BEGIN_DATE, deadline.getMidtermBeginDate());
+        valueOperations.set(RedisKeyConstant.MIDTERM_END_DATE, deadline.getMidtermEndDate());
+        valueOperations.set(RedisKeyConstant.COMPLETION_BEGIN_DATE, deadline.getCompletionBeginDate());
+        valueOperations.set(RedisKeyConstant.COMPLETION_END_DATE, deadline.getCompletionEndDate());
+        if (deadline.getPostponeBeginDate() != null) {
+            valueOperations.set(RedisKeyConstant.POSTPONE_BEGIN_DATE, deadline.getPostponeBeginDate());
+        }
+        if (deadline.getPostponeEndDate() != null) {
+            valueOperations.set(RedisKeyConstant.POSTPONE_END_DATE, deadline.getPostponeEndDate());
+        }
     }
 }

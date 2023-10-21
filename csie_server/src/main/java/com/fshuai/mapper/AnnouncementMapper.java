@@ -22,4 +22,5 @@ public interface AnnouncementMapper {
 
     void updateById(AnnouncementUpdateDTO announcementUpdateDTO);
 
+    Announcement selectDetailById(Integer id);
 }

@@ -8,6 +8,8 @@ import com.fshuai.mapper.ProjectFileMapper;
 import com.fshuai.mapper.ProjectMapper;
 import com.fshuai.service.FileService;
 import com.fshuai.utils.AliOssUtil;
+import com.fshuai.utils.StringUtil;
+import com.fshuai.vo.ProjectFileVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,9 @@ public class FileServiceImpl implements FileService {
     @Autowired
     ProjectFileMapper projectFileMapper;
 
+    @Autowired
+    StringUtil stringUtil;
+
     static Map<Integer, String> fileNameMap = new HashMap<>();
 
     static Map<Integer, String> fileNameEnglishMap = new HashMap<>();
@@ -41,7 +46,7 @@ public class FileServiceImpl implements FileService {
         fileNameMap.put(7, "结项审核材料");
         fileNameMap.put(10, "延期审核材料");
         fileNameMap.put(-1, "成员变更材料");
-        fileNameMap.put(-2, "公告材料");
+        fileNameMap.put(-2, "公告");
         fileNameMap.put(-3, "模版材料");
 
         fileNameEnglishMap.put(1, "approval_review");
@@ -62,7 +67,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public String uploadFile(MultipartFile file) {
         // 检查文档是否为空
-        if (file.isEmpty()) {
+        if (file == null || file.isEmpty()) {
             throw new StudentProjectException(MessageConstant.FILE_ADD_FAILED_STATE_FALSE);
         }
         String suffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
@@ -78,12 +83,19 @@ public class FileServiceImpl implements FileService {
      * @return 每一个文件的id
      */
     @Override
-    public List<Integer> updateProjectFile(Project project, List<String> attachments) {
-        // 检查项目的状态是否和申请时的状态一致
-        String fileName = fileNameMap.get(project.getState());
+    public String insertProjectFile(Project project, List<String> attachments) {
+        return insertFile(project.getNumber(), project.getState(), attachments);
+    }
+
+
+    @Override
+    public String insertFile(String name, Integer state, List<String> attachments) {
+        // 检查附件是否非空
         if (attachments == null || attachments.isEmpty()) {
             return null;
         }
+        // 根据状态获取名称
+        String fileName = fileNameMap.get(state);
         if (fileName == null) {
             throw new StudentProjectException(MessageConstant.STATE_FAILED);
         }
@@ -93,22 +105,29 @@ public class FileServiceImpl implements FileService {
             String suffix = attachment.substring(attachment.lastIndexOf("."));
             ProjectFile projectFile = ProjectFile
                     .builder()
-                    .state(project.getState())
-                    .name(project.getNumber() + fileName + count + suffix)
+                    .state(state)
+                    .name(name + "_" + fileName + count + suffix)
                     .url(attachment)
                     .build();
             count++;
             projectFileMapper.insertProjectFile(projectFile);
             fileIds.add(projectFile.getId());
         }
-        return fileIds;
+        return stringUtil.listTOString(fileIds);
     }
+
 
     @Override
     public void deleteFile(Project project) {
         String fileName = fileNameMap.get(project.getState());
         projectFileMapper.deleteLikeName(project.getNumber() + fileName);
         //:TODO 删除阿里云中的文件
+    }
+
+    @Override
+    public List<ProjectFileVO> getProjectFileByIds(String attachments) {
+        String[] ids = attachments.split(",");
+        return projectFileMapper.selectProjectFileVOByIds(ids);
     }
 
 

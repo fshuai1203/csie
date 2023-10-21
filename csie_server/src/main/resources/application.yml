@@ -11,6 +11,11 @@ spring:
     date-format: yyyy-MM-dd
   main:
     allow-circular-references: true
+  redis:
+    host: ${csie.redis.host}
+    port: ${csie.redis.port}
+    password: ${csie.redis.password}
+    database: ${csie.redis.database}
   datasource:
     druid:
       driver-class-name: ${csie.datasource.driver-class-name}

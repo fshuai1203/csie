@@ -15,7 +15,7 @@ csie:
     host: localhost
     port: 6379
     password: fshuai1203
-    database: 0
+    database: 1
   servlet:
     multipart:
       max-request-size: 300MB

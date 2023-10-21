@@ -60,56 +60,38 @@
     </select>
     <select id="pageQuery" resultType="com.fshuai.vo.ProjectPageVO">
         SELECT
-        p.*,
-        t.`name` teacherName,
-        s.`name` principalName,
-        d.`name` deptName
+        *
         FROM
-        project p,
-        teacher t,
-        student s,
-        department d
+        project
         <where>
-            p.teacher_id = t.id
-            AND p.dept_id = d.id
-            AND p.principal_id = s.id
             <if test="beginTime != null and beginTime!='' ">
-                and p.begin_time = #{beginTime}
+                and begin_time = #{beginTime}
             </if>
             <if test="name != null and name!='' ">
-                and p.name = #{name}
+                and name = #{name}
             </if>
             <if test="deptId != null">
-                and p.dept_id=#{deptId}
+                and dept_id=#{deptId}
             </if>
             <if test="type != null">
-                and p.type=#{type}
+                and type=#{type}
             </if>
             <if test="state != null">
-                and p.state=#{state}
+                and state=#{state}
             </if>
         </where>
     </select>
     <select id="reviewPageQuery" resultType="com.fshuai.vo.ProjectPageVO">
         SELECT
-        p.*,
-        t.`name` teacherName,
-        s.`name` principalName,
-        d.`name` deptName
+        *
         FROM
-        project p,
-        teacher t,
-        student s,
-        department d
+        project
         <where>
-            p.teacher_id = t.id
-            AND p.dept_id = d.id
-            AND p.principal_id = s.id
             <if test="deptId != null">
-                and p.dept_id=#{deptId}
+                and dept_id=#{deptId}
             </if>
             <if test="states != null">
-                and p.state in
+                and state in
                 <foreach collection="states" separator="," item="state" open="(" close=")">
                     #{state}
                 </foreach>

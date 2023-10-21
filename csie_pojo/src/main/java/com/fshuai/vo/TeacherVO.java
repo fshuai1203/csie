@@ -17,4 +17,5 @@ public class TeacherVO {
     private String deptName;
     private String majorName;
     private Integer role;
+    private String phone;
 }

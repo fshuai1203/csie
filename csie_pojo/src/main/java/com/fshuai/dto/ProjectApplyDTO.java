@@ -22,8 +22,6 @@ public class ProjectApplyDTO {
     private Integer category;
     // 指导教师
     private Integer teacherId;
-    // 指导教师
-    private String teacherName;
 
     // 负责人
     private MemberDTO principal;

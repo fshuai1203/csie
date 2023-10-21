@@ -5,8 +5,9 @@ package com.fshuai.constant;
  */
 public class MessageConstant {
     public static final String REGISTER_FIELD_EMPTY = "注册字段为空";
+    public static final String TEACHER_STUDENT_ID_ERROR = "学生或教师学号错误";
     public static final String STUDENT_ID_NUMBER_ERROR = "学生学号错误";
-    public static final String TEACHER_ID_NUMBER_ERROR = "学生学号错误";
+    public static final String TEACHER_ID_NUMBER_ERROR = "教师学号错误";
     public static final String REGISTER_FIELD_ILLEGAL = "非法注册";
     public static final String ID_NUMBER_HAS_EXISTS = "学号已经存在";
     public static final String LOGIN_FIELD_EMPTY = "登陆字段为空";

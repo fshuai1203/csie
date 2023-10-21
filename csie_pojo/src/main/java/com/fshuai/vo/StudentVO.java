@@ -14,6 +14,7 @@ public class StudentVO {
     private String idNumber;
 
     private Integer deptId;
+    private String deptName;
     private String majorName ;
     private String phone;
 

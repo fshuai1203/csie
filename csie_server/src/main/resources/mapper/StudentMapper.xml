@@ -57,4 +57,12 @@
             #{memberId}
         </foreach>
     </select>
+    <select id="selectStudentNameByIds" resultType="java.lang.String">
+        select name
+        from student
+        where id in
+        <foreach collection="memberIds" item="memberId" separator="," open="(" close=")">
+            #{memberId}
+        </foreach>
+    </select>
 </mapper>

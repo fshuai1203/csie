@@ -16,7 +16,6 @@ class PaperDTO {
     private String searchNumber;
     // 第一作者
     private String firstAuthor;
-
     // 项目地址
     private String uri;
 
