@@ -14,4 +14,8 @@ public interface StudentService {
 
     void update(StudentDTO studentDTO);
 
+    void updatePassword(UpdatePasswordDTO updatePasswordDTO);
+
+    void logout();
+
 }

@@ -48,7 +48,7 @@ public class JwtTokenStudentInterceptor implements HandlerInterceptor {
         try {
             log.info("jwt校验:{}", token);
             Claims claims = JwtUtil.parseJWT(jwtProperties.getStudentSecretKey(), token);
-            Long stuId = Long.valueOf(claims.get(JwtClaimsConstant.STU_ID).toString());
+            Integer stuId = Integer.valueOf(claims.get(JwtClaimsConstant.STU_ID).toString());
             log.info("当前学生id：{}", stuId);
             BaseContext.setCurrentId(stuId);
             //3、通过，放行

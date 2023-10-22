@@ -57,20 +57,34 @@ public class StudentUserController {
                 .build();
         BeanUtils.copyProperties(student, studentLoginVO);
 
-        return Result.success(studentLoginVO);
+        return Result.success("登陆成功", studentLoginVO);
     }
 
     @ApiOperation("学生注册")
     @PostMapping("/register")
     public Result register(@RequestBody StudentRegisterDTO studentRegisterDTO) {
         studentService.register(studentRegisterDTO);
-        return Result.success();
+        return Result.success("学生注册成功");
     }
 
     @ApiOperation("学生信息修改")
     @PutMapping
     public Result update(@RequestBody StudentDTO studentDTO) {
         studentService.update(studentDTO);
+        return Result.success();
+    }
+
+    @ApiOperation("修改密码")
+    @PutMapping("/password")
+    public Result updatePassword(@RequestBody UpdatePasswordDTO updatePasswordDTO) {
+        studentService.updatePassword(updatePasswordDTO);
+        return Result.success("修改密码成功");
+    }
+
+    @ApiOperation("学生退出")
+    @PostMapping("/logout")
+    public Result<String> logout() {
+        studentService.logout();
         return Result.success();
     }
 

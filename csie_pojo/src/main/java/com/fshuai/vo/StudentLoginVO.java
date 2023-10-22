@@ -17,9 +17,7 @@ public class StudentLoginVO {
     private Integer sex;
     private Integer deptId;
     private Integer majorId;
-    private String password;
     private String phone;
-    private Integer state;
     // 返回jwt令牌
     private String token;
 }

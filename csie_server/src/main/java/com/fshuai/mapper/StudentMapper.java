@@ -8,4 +8,8 @@ public interface StudentMapper {
     Student selectByIdNumber(String idNumber);
 
     void insert(Student student);
+
+    Student selectById(Integer studentID);
+
+    void updateById(Student student);
 }
