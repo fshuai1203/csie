@@ -2,14 +2,46 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.fshuai.mapper.StudentMapper">
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        insert into student(name,id_number,sex,dept_id,major_id,password,phone,state)
-        values (#{name},#{idNumber},#{sex},#{deptId},#{majorId},#{password},#{phone},#{state})
+        insert into student(name,id_number,sex,dept_id,major_name,password,phone,state)
+        values (#{name},#{idNumber},#{sex},#{deptId},#{majorName},#{password},#{phone},#{state})
     </insert>
+    <update id="updateById">
+        update student
+        <set>
+            <if test="name != null and name!='' ">
+                name=#{name},
+            </if>
+            <if test="sex != null">
+                sex=#{sex},
+            </if>
+            <if test="deptId != null">
+                dept_id=#{deptId},
+            </if>
+            <if test="majorName != null and majorName!=''">
+                major_name=#{majorName},
+            </if>
+            <if test="password != null and password!=''">
+                password=#{password},
+            </if>
+            <if test="phone != null and phone!=''">
+                phone=#{phone},
+            </if>
+            <if test="state != null">
+                state=#{state},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
 
 
     <select id="selectByIdNumber" resultType="com.fshuai.entity.Student">
         select *
         from student
         where id_number = #{idNumber}
+    </select>
+    <select id="selectById" resultType="com.fshuai.entity.Student">
+        select *
+        from student
+        where id = #{studentID}
     </select>
 </mapper>

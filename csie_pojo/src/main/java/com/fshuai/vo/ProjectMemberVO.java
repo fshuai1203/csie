@@ -12,7 +12,7 @@ public class ProjectMemberVO {
     private String idNumber;
 
     private Integer deptId;
-    private Integer majorId;
+    private String majorName ;
     private String phone;
 
 }

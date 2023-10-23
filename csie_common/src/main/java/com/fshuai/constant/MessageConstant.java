@@ -8,10 +8,11 @@ public class MessageConstant {
     public static final String ID_NUMBER_HAS_EXISTS = "学号已经存在";
     public static final String LOGIN_FIELD_EMPTY = "登陆字段为空";
     public static final String LOGIN_FAILED = "当前用户未注册";
-
     public static final String PASSWORD_ERROR = "密码错误";
     public static final String OLD_PASSWORD_ERROR = "旧密码错误";
+    public static final String ROLE_FAILED = "当前用户无权限";
     public static final String EDIT_FAILED = "修改失败";
+    public static final String EDIT_FAILED_EMPTY = "修改字段为空";
 
     public static final String ALREADY_EXIST = "账号已经存在";
     public static final String ACCOUNT_NOT_FOUND = "账号不存在";

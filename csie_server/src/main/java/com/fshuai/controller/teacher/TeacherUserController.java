@@ -1,9 +1,7 @@
 package com.fshuai.controller.teacher;
 
 import com.fshuai.constant.JwtClaimsConstant;
-import com.fshuai.dto.TeacherDTO;
-import com.fshuai.dto.TeacherLoginDTO;
-import com.fshuai.dto.TeacherPageQueryDTO;
+import com.fshuai.dto.*;
 import com.fshuai.entity.Teacher;
 import com.fshuai.properties.JwtProperties;
 import com.fshuai.result.PageResult;
@@ -42,10 +40,12 @@ public class TeacherUserController {
 
         // 登陆失败抛出异常被捕获
         // 登录成功后，生成jwt令牌
-        // jwt令牌中存放老师的权限类型
+        // jwt令牌中存放老师的id和权限类型
         Map<String, Object> claims = new HashMap<>();
         claims.put(JwtClaimsConstant.TEA_ID, teacher.getId());
         claims.put(JwtClaimsConstant.TEA_ROLE, teacher.getRole());
+        claims.put(JwtClaimsConstant.TEA_DEPT, teacher.getDeptId());
+        log.info(claims.toString());
         String token = JwtUtil.createJWT(
                 jwtProperties.getTeacherSecretKey(),
                 jwtProperties.getTeacherTtl(),
@@ -62,29 +62,35 @@ public class TeacherUserController {
 
     @ApiOperation("添加教师")
     @PostMapping("")
-    public Result save(@RequestBody TeacherDTO teacherDTO) {
-        teacherService.save(teacherDTO);
+    public Result save(@RequestBody TeacherRegisterDTO teacherRegisterDTO) {
+        teacherService.save(teacherRegisterDTO);
         return Result.success();
     }
 
-    @ApiOperation("修改教师")
-    @PutMapping
-    public Result update(@RequestBody TeacherDTO teacherDTO) {
-        teacherService.update(teacherDTO);
+    @ApiOperation("修改教师权限")
+    @PutMapping("/role")
+    public Result update(@RequestBody TeacherUpdateDTO teacherUpdateDTO) {
+        teacherService.updateRole(teacherUpdateDTO);
         return Result.success();
     }
 
     @ApiOperation("教师分页查询")
     @GetMapping("/page")
     public Result<PageResult> getPage(TeacherPageQueryDTO teacherPageQueryDTO) {
+        log.info("请求分页查询老师数据{}",teacherPageQueryDTO);
         PageResult pageResult = teacherService.pageQuery(teacherPageQueryDTO);
         return Result.success(pageResult);
     }
 
+    /**
+     * 传入教师信息用于检查权限
+     * @param teachers
+     * @return
+     */
     @ApiOperation("批量删除教师")
     @DeleteMapping()
-    public Result<PageResult> deleteByIds(@RequestParam List<Long> ids) {
-        teacherService.deleteBatch(ids);
+    public Result<PageResult> deleteByIds(@RequestBody List<TeacherDTO> teachers) {
+        teacherService.deleteBatch(teachers);
         return Result.success();
     }
 

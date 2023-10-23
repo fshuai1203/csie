@@ -1,8 +1,6 @@
 package com.fshuai.service;
 
-import com.fshuai.dto.TeacherDTO;
-import com.fshuai.dto.TeacherLoginDTO;
-import com.fshuai.dto.TeacherPageQueryDTO;
+import com.fshuai.dto.*;
 import com.fshuai.entity.Teacher;
 import com.fshuai.result.PageResult;
 
@@ -11,11 +9,11 @@ import java.util.List;
 public interface TeacherService {
     Teacher login(TeacherLoginDTO loginDTO);
 
-    void save(TeacherDTO loginDTO);
+    void save(TeacherRegisterDTO teacherPageDTO);
 
-    void update(TeacherDTO teacherDTO);
+    void updateRole(TeacherUpdateDTO teacherUpdateDTO);
 
     PageResult pageQuery(TeacherPageQueryDTO teacherPageQueryDTO);
 
-    void deleteBatch(List<Long> ids);
+    void deleteBatch(List<TeacherDTO> teachers);
 }

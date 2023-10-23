@@ -45,6 +45,9 @@ fshuai:
     teacher-ttl: 7200000
     # 设置前端传递过来的令牌名称
     teacher-token-name: teacher-token
+    teacher-id-key: teacherId
+    teacher-role-key: teacherRole
+    teacher-dept-key: teacherDept
 
 
     student-secret-key: fshuai

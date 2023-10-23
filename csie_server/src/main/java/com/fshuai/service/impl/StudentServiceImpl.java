@@ -2,7 +2,7 @@ package com.fshuai.service.impl;
 
 import com.fshuai.constant.MessageConstant;
 import com.fshuai.constant.StatusConstant;
-import com.fshuai.context.BaseContext;
+import com.fshuai.context.StudentBaseContext;
 import com.fshuai.dto.StudentDTO;
 import com.fshuai.dto.StudentLoginDTO;
 import com.fshuai.dto.StudentRegisterDTO;
@@ -10,7 +10,6 @@ import com.fshuai.dto.UpdatePasswordDTO;
 import com.fshuai.entity.Student;
 import com.fshuai.exception.LoginFailedException;
 import com.fshuai.exception.PasswordEditFailedException;
-import com.fshuai.exception.PasswordErrorException;
 import com.fshuai.exception.RegisterFailedException;
 import com.fshuai.mapper.StudentMapper;
 import com.fshuai.service.StudentService;
@@ -52,6 +51,10 @@ public class StudentServiceImpl implements StudentService {
         if (studentFromDB == null || studentFromDB.getIdNumber().isEmpty()) {
             throw new LoginFailedException(MessageConstant.LOGIN_FAILED);
         }
+        // 检查用户状态
+        if (studentFromDB.getState() == StatusConstant.DISABLE) {
+            throw new LoginFailedException(MessageConstant.LOGIN_FAILED);
+        }
         // 检查密码是否正确
         if (!bCryptPasswordEncoder.matches(loginDTO.getPassword(), studentFromDB.getPassword())) {
             throw new LoginFailedException(MessageConstant.PASSWORD_ERROR);
@@ -79,7 +82,7 @@ public class StudentServiceImpl implements StudentService {
         if (studentRegisterDTO.getDeptId() == null) {
             throw new RegisterFailedException(MessageConstant.REGISTER_FIELD_EMPTY);
         }
-        if (studentRegisterDTO.getMajorId() == null) {
+        if (studentRegisterDTO.getMajorName() == null || studentRegisterDTO.getMajorName().isEmpty()) {
             throw new RegisterFailedException(MessageConstant.REGISTER_FIELD_EMPTY);
         }
         if (studentRegisterDTO.getPassword() == null || studentRegisterDTO.getPassword().isEmpty()) {
@@ -111,7 +114,7 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public void update(StudentDTO studentDTO) {
         // 获取学生ID
-        Integer studentID = BaseContext.getCurrentId();
+        Integer studentID = StudentBaseContext.getCurrentId();
         Student student = Student.builder()
                 .id(studentID)
                 .build();
@@ -128,7 +131,7 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public void updatePassword(UpdatePasswordDTO updatePasswordDTO) {
         // 获取学生ID
-        Integer studentID = BaseContext.getCurrentId();
+        Integer studentID = StudentBaseContext.getCurrentId();
         // 根据ID查询学生信息
         Student studentByDB = studentMapper.selectById(studentID);
         // 检查旧密码是否匹配,并捕获异常进行处理

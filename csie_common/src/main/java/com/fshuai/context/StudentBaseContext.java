@@ -1,6 +1,7 @@
 package com.fshuai.context;
 
-public class BaseContext {
+
+public class StudentBaseContext {
 
     public static ThreadLocal<Integer> threadLocal = new ThreadLocal<>();
 

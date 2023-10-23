@@ -6,5 +6,8 @@ package com.fshuai.constant;
 public class PasswordConstant {
 
     public static final String DEFAULT_PASSWORD = "123456";
-
+    public static final String SCHOOL_HEAD_DEFAULT_PASSWORD = "123456";
+    public static final String DEPARTMENT_HEAD_DEFAULT_PASSWORD = "123456";
+    public static final String GUIDE_TEACHER_DEFAULT_PASSWORD = "123456";
+    public static final String CHECK_TEACHER_DEFAULT_PASSWORD = "123456";
 }

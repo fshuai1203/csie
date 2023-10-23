@@ -1,7 +1,7 @@
 package com.fshuai.interceptor;
 
 import com.fshuai.constant.JwtClaimsConstant;
-import com.fshuai.context.BaseContext;
+import com.fshuai.context.StudentBaseContext;
 import com.fshuai.properties.JwtProperties;
 import com.fshuai.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
@@ -50,7 +50,7 @@ public class JwtTokenStudentInterceptor implements HandlerInterceptor {
             Claims claims = JwtUtil.parseJWT(jwtProperties.getStudentSecretKey(), token);
             Integer stuId = Integer.valueOf(claims.get(JwtClaimsConstant.STU_ID).toString());
             log.info("当前学生id：{}", stuId);
-            BaseContext.setCurrentId(stuId);
+            StudentBaseContext.setCurrentId(stuId);
             //3、通过，放行
             return true;
         } catch (Exception ex) {

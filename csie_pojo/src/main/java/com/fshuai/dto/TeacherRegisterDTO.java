@@ -3,14 +3,14 @@ package com.fshuai.dto;
 import lombok.Data;
 
 @Data
-public class StudentRegisterDTO {
+public class TeacherRegisterDTO {
 
     private String name;
     private String idNumber;
     private Integer sex;
     private Integer deptId;
-    private String majorName ;
-    private String password;
+    private String majorName;
     private String phone;
-    private String avatar;
+    private Integer role;
+
 }

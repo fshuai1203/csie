@@ -9,13 +9,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TeacherLoginVO {
+public class TeacherVO {
+    private Integer id;
     private String name;
     private String idNumber;
-    private Integer sex;
+    private Integer deptId;
+    private String deptName;
     private String majorName;
-    private String phone;
     private Integer role;
-    // 返回jwt令牌
-    private String token;
 }

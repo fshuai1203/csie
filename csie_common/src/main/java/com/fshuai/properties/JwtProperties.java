@@ -15,6 +15,10 @@ public class JwtProperties {
     private String teacherSecretKey;
     private long teacherTtl;
     private String teacherTokenName;
+    private String teacherIdKey = "teacherId";
+    private String teacherRoleKey = "teacherRole";
+    private String teacherDeptKey = "teacherDept";
+
 
     /**
      * 学生端端微信用户生成jwt令牌相关配置

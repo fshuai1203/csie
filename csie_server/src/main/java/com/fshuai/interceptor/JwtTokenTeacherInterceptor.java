@@ -1,7 +1,8 @@
 package com.fshuai.interceptor;
 
 import com.fshuai.constant.JwtClaimsConstant;
-import com.fshuai.context.BaseContext;
+import com.fshuai.context.StudentBaseContext;
+import com.fshuai.context.TeacherBaseContext;
 import com.fshuai.properties.JwtProperties;
 import com.fshuai.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
@@ -13,6 +14,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * jwt令牌校验的拦截器
@@ -50,11 +53,20 @@ public class JwtTokenTeacherInterceptor implements HandlerInterceptor {
             Claims claims = JwtUtil.parseJWT(jwtProperties.getTeacherSecretKey(), token);
             Integer teacherId = Integer.valueOf(claims.get(JwtClaimsConstant.TEA_ID).toString());
             log.info("当前老师id：{}", teacherId);
-            BaseContext.setCurrentId(teacherId);
+            Integer teacherRole = Integer.valueOf(claims.get(JwtClaimsConstant.TEA_ROLE).toString());
+            log.info("当前老师身份：{}", teacherRole);
+            Integer teacherDept = Integer.valueOf(claims.get(JwtClaimsConstant.TEA_DEPT).toString());
+            log.info("当前老师系别：{}", teacherDept);
+            Map teacherMap = new HashMap();
+            teacherMap.put(jwtProperties.getTeacherIdKey(),teacherId);
+            teacherMap.put(jwtProperties.getTeacherRoleKey(),teacherRole);
+            teacherMap.put(jwtProperties.getTeacherDeptKey(),teacherDept);
+            TeacherBaseContext.setCurrentTeacher(teacherMap);
             //3、通过，放行
             return true;
         } catch (Exception ex) {
             //4、不通过，响应401状态码
+            log.info(ex.toString());
             response.setStatus(401);
             return false;
         }
