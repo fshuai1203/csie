@@ -77,20 +77,21 @@ public class TeacherUserController {
     @ApiOperation("教师分页查询")
     @GetMapping("/page")
     public Result<PageResult> getPage(TeacherPageQueryDTO teacherPageQueryDTO) {
-        log.info("请求分页查询老师数据{}",teacherPageQueryDTO);
+        log.info("请求分页查询老师数据{}", teacherPageQueryDTO);
         PageResult pageResult = teacherService.pageQuery(teacherPageQueryDTO);
         return Result.success(pageResult);
     }
 
     /**
-     * 传入教师信息用于检查权限
-     * @param teachers
+     * 批量删除教师
+     *
+     * @param ids 教师id用,分割
      * @return
      */
     @ApiOperation("批量删除教师")
     @DeleteMapping()
-    public Result<PageResult> deleteByIds(@RequestBody List<TeacherDTO> teachers) {
-        teacherService.deleteBatch(teachers);
+    public Result<PageResult> deleteByIds(@RequestParam List<Integer> ids) {
+        teacherService.deleteBatch(ids);
         return Result.success();
     }
 

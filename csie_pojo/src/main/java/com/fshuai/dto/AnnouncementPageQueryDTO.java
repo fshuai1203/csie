@@ -2,6 +2,7 @@ package com.fshuai.dto;
 
 
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
@@ -9,9 +10,9 @@ import java.time.LocalDate;
 public class AnnouncementPageQueryDTO {
 
     private String title;
-    private LocalDate publishDate;
+
+    private String publishDate;
     private Integer deptId;
-    private Integer category;
     //  页码
     private int page;
 

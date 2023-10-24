@@ -5,6 +5,7 @@ import com.fshuai.dto.TeacherPageQueryDTO;
 import com.fshuai.entity.Teacher;
 import com.fshuai.vo.TeacherVO;
 import com.github.pagehelper.Page;
+import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -21,5 +22,7 @@ public interface TeacherMapper {
 
     Page<TeacherVO> pageQuery(TeacherPageQueryDTO teacherPageQueryDTO);
 
-    void deleteBatch(List<TeacherDTO> teachers);
+    void deleteBatchByIds(List<Integer> ids);
+
+    List<Teacher> selectByIdsCheckRoleOrNotDept(List<Integer> ids,Integer role,Integer deptId);
 }

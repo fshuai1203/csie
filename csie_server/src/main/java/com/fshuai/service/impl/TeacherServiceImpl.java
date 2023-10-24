@@ -232,10 +232,10 @@ public class TeacherServiceImpl implements TeacherService {
      * 系级教师只能删除系级的老师
      * 校级老师可以删除所有老师
      *
-     * @param teachers
+     * @param ids
      */
     @Override
-    public void deleteBatch(List<TeacherDTO> teachers) {
+    public void deleteBatch(List<Integer> ids) {
         // 获取当前用户的权限
         Map teacherMap = TeacherBaseContext.getCurrentTeacher();
         Integer teacherDept = (Integer) teacherMap.get(jwtProperties.getTeacherDeptKey());
@@ -243,16 +243,17 @@ public class TeacherServiceImpl implements TeacherService {
         Integer teacherRole = (Integer) teacherMap.get(jwtProperties.getTeacherRoleKey());
         // 校级负责人可以删除所有人
         if (teacherRole == RoleConstant.SCHOOL_HEAD) {
-            teacherMapper.deleteBatch(teachers);
+            teacherMapper.deleteBatchByIds(ids);
+            return;
         }
         // 系级负责人只能删除本系的人,且权限低的老师
         if (teacherRole == RoleConstant.DEPARTMENT_HEAD) {
-            for (TeacherDTO teacher : teachers) {
-                if (teacher.getRole() == RoleConstant.SCHOOL_HEAD || teacher.getDeptId() != teacherDept) {
-                    throw new DeletionNotAllowedException(MessageConstant.ROLE_FAILED + "删除(" + teacher.getName() + ")");
-                }
+            // 检查ids里面有没有校级负责人和其他系的老师
+            // 如果为空，则说明ids里面的老师都能够删除
+            if (teacherMapper.selectByIdsCheckRoleOrNotDept(ids, RoleConstant.SCHOOL_HEAD, teacherDept).isEmpty()) {
+                teacherMapper.deleteBatchByIds(ids);
+                return;
             }
-            teacherMapper.deleteBatch(teachers);
         }
         throw new DeletionNotAllowedException(MessageConstant.ROLE_FAILED);
     }

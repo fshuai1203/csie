@@ -15,5 +15,5 @@ public interface TeacherService {
 
     PageResult pageQuery(TeacherPageQueryDTO teacherPageQueryDTO);
 
-    void deleteBatch(List<TeacherDTO> teachers);
+    void deleteBatch(List<Integer> ids);
 }

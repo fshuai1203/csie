@@ -35,14 +35,6 @@
         </set>
         where id_number = #{idNumber}
     </update>
-    <delete id="deleteBatch">
-        delete from teacher where id in
-        <foreach collection="teachers" item="teacher" separator="," open="(" close=")">
-            #{teacher.id}
-        </foreach>
-    </delete>
-
-
     <select id="selectByIdNumber" resultType="com.fshuai.entity.Teacher">
         select *
         from teacher
@@ -78,4 +70,20 @@
             </if>
         </where>
     </select>
+    <select id="selectByIdsCheckRoleOrNotDept" resultType="com.fshuai.entity.Teacher">
+        SELECT *
+        from teacher
+        WHERE id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+        and (role = #{role} or dept_id != #{deptId})
+    </select>
+
+    <delete id="deleteBatchByIds">
+        delete from teacher where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>

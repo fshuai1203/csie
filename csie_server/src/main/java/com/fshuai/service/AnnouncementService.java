@@ -8,9 +8,9 @@ import java.util.List;
 public interface AnnouncementService {
     PageResult pageQuery(AnnouncementPageQueryDTO announcementDTO);
 
-    void update(AnnouncementDTO announcementDTO);
+    void update(AnnouncementUpdateDTO announcementUpdateDTO);
 
     void add(AnnouncementDTO announcementDTO);
 
-    void deleteBatch(List<Long> ids);
+    void deleteBatch(List<Integer> ids);
 }

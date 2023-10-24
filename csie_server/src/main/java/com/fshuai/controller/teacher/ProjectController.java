@@ -1,9 +1,6 @@
 package com.fshuai.controller.teacher;
 
-import com.fshuai.dto.AttachmentPageDTO;
-import com.fshuai.dto.ProjectFinancePageDTO;
-import com.fshuai.dto.ProjectPageQueryDTO;
-import com.fshuai.dto.ProjectReviewDTO;
+import com.fshuai.dto.*;
 import com.fshuai.result.PageResult;
 import com.fshuai.result.Result;
 import com.fshuai.service.ProjectService;

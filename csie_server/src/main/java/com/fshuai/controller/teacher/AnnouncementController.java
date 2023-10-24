@@ -2,6 +2,7 @@ package com.fshuai.controller.teacher;
 
 import com.fshuai.dto.AnnouncementDTO;
 import com.fshuai.dto.AnnouncementPageQueryDTO;
+import com.fshuai.dto.AnnouncementUpdateDTO;
 import com.fshuai.result.PageResult;
 import com.fshuai.result.Result;
 import com.fshuai.service.AnnouncementService;
@@ -25,14 +26,15 @@ public class AnnouncementController {
     @GetMapping("/page")
     @ApiOperation("公告查询")
     public Result<PageResult> getAnnouncement(AnnouncementPageQueryDTO announcementDTO) {
+        log.info("查询公告{}",announcementDTO);
         PageResult pageResult = announcementService.pageQuery(announcementDTO);
         return Result.success(pageResult);
     }
 
     @PutMapping
     @ApiOperation("修改公告")
-    public Result updateAnnouncement(@RequestBody AnnouncementDTO announcementDTO) {
-        announcementService.update(announcementDTO);
+    public Result updateAnnouncement(@RequestBody AnnouncementUpdateDTO announcementUpdateDTO) {
+        announcementService.update(announcementUpdateDTO);
         return Result.success();
     }
 
@@ -45,7 +47,7 @@ public class AnnouncementController {
 
     @ApiOperation("批量删除公告")
     @DeleteMapping()
-    public Result<PageResult> deleteByIds(@RequestParam List<Long> ids) {
+    public Result<PageResult> deleteByIds(@RequestParam List<Integer> ids) {
         announcementService.deleteBatch(ids);
         return Result.success();
     }
