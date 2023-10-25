@@ -1,6 +1,7 @@
 package com.fshuai.controller.teacher;
 
 import com.fshuai.dto.ProjectDeadlineDTO;
+import com.fshuai.dto.ProjectDeadlineUpdateDTO;
 import com.fshuai.result.Result;
 import com.fshuai.service.DeadlineService;
 import com.fshuai.vo.ProjectDeadlineVO;
@@ -28,8 +29,15 @@ public class DeadlineController {
 
     @PutMapping
     @ApiOperation("修改大创时间")
-    public Result updateDeadLine(@RequestBody ProjectDeadlineDTO projectDeadlineDTO) {
-        deadlineService.updateDeadLine(projectDeadlineDTO);
+    public Result updateDeadLine(@RequestBody ProjectDeadlineUpdateDTO projectDeadlineUpdateDTO) {
+        deadlineService.updateDeadLine(projectDeadlineUpdateDTO);
+        return Result.success();
+    }
+
+    @PostMapping
+    @ApiOperation("添加大创时间")
+    public Result addDeadLine(@RequestBody ProjectDeadlineDTO projectDeadlineDTO) {
+        deadlineService.addDeadLine(projectDeadlineDTO);
         return Result.success();
     }
 

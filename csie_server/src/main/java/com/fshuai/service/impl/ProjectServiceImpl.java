@@ -1,5 +1,6 @@
 package com.fshuai.service.impl;
 
+import com.fshuai.context.StudentBaseContext;
 import com.fshuai.dto.*;
 import com.fshuai.result.PageResult;
 import com.fshuai.service.ProjectService;
@@ -47,8 +48,13 @@ public class ProjectServiceImpl implements ProjectService {
         return null;
     }
 
+    /**
+     * 学生添加自己的项目
+     * 必须是负责人才能添加项目
+     * @param projectApplyDTO
+     */
     @Override
-    public void addProject(ProjectDTO projectDTO) {
+    public void addProject(ProjectApplyDTO projectApplyDTO) {
 
     }
 

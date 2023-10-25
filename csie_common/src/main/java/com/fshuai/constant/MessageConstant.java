@@ -13,6 +13,10 @@ public class MessageConstant {
     public static final String ROLE_FAILED = "当前用户无权限";
     public static final String EDIT_FAILED = "修改失败";
     public static final String EDIT_FAILED_EMPTY = "修改字段为空";
+    public static final String PROJECT_DEADLINE_FIELD_EMPTY = "修改字段为空";
+
+
+    public static final String DEADLINE_NOT_INSERT = "未添加时间线";
 
     public static final String ALREADY_EXIST = "账号已经存在";
     public static final String ACCOUNT_NOT_FOUND = "账号不存在";

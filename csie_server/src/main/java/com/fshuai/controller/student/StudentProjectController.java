@@ -28,8 +28,8 @@ public class StudentProjectController {
 
     @PostMapping("/apply")
     @ApiOperation("项目申报")
-    public Result applyProject(@RequestBody ProjectDTO projectDTO) {
-        projectService.addProject(projectDTO);
+    public Result applyProject(@RequestBody ProjectApplyDTO projectApplyDTO) {
+        projectService.addProject(projectApplyDTO);
         return Result.success();
     }
 

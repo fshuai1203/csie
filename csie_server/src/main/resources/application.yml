@@ -10,7 +10,6 @@ spring:
       password: fshuai
   jackson:
     date-format: yyyy-MM-dd
-    time-zone: GMT+8
   main:
     allow-circular-references: true
   datasource:

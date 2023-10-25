@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fshuai.mapper.DeadlineMapper">
+    <insert id="add">
+        INSERT INTO project_deadline (deadline_id, approval_begin_date, approval_end_date, midterm_begin_date,
+        midterm_end_date, completion_begin_date, completion_end_date )
+        VALUES
+        (#{deadlineId},#{approvalBeginDate},#{approvalEndDate},#{midtermBeginDate},#{midtermEndDate},#{completionBeginDate},#{completionEndDate})
+    </insert>
+    <update id="update">
+        update project_deadline
+        <set>
+            <if test="approvalBeginDate != null ">
+                approval_begin_date=#{approvalBeginDate},
+            </if>
+            <if test="approvalEndDate != null ">
+                approval_end_date=#{approvalEndDate},
+            </if>
+            <if test="midtermBeginDate != null ">
+                midterm_begin_date=#{midtermBeginDate},
+            </if>
+            <if test="midtermEndDate != null ">
+                midterm_end_date=#{midtermEndDate},
+            </if>
+            <if test="completionBeginDate != null ">
+                completion_begin_date=#{completionBeginDate},
+            </if>
+            <if test="completionEndDate != null ">
+                completion_end_date=#{completionEndDate},
+            </if>
+            <if test="postponeBeginDate != null ">
+                postpone_begin_date=#{postponeBeginDate},
+            </if>
+            <if test="postponeEndDate != null ">
+                postpone_end_date=#{postponeEndDate},
+            </if>
+        </set>
+        where deadline_id = #{deadlineId}
+    </update>
+    <select id="selectById" resultType="com.fshuai.entity.ProjectDeadline">
+        select *
+        from project_deadline
+        where deadline_id = #{deadlineId}
+    </select>
+</mapper>

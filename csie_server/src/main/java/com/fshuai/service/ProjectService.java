@@ -21,7 +21,7 @@ public interface ProjectService {
 
     PageResult getMyProject();
 
-    void addProject(ProjectDTO projectDTO);
+    void addProject(ProjectApplyDTO projectApplyDTO);
 
     PageResult getReviewProjects(Integer state);
 
