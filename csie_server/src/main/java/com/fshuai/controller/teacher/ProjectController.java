@@ -52,8 +52,15 @@ public class ProjectController {
 
     @GetMapping("/finance")
     @ApiOperation("财务统计")
-    public Result getProjectFinance(@RequestBody ProjectFinancePageDTO projectFinancePageDTO) {
-        projectService.getProjectFinance(projectFinancePageDTO);
+    public Result<PageResult> getProjectFinance(ProjectFinancePageDTO projectFinancePageDTO) {
+        PageResult projectFinance = projectService.getProjectFinance(projectFinancePageDTO);
+        return Result.success(projectFinance);
+    }
+
+    @PostMapping("/finance")
+    @ApiOperation("财务审核")
+    public Result<PageResult> projectFinanceReview(@RequestBody ProjectFinanceReviewDTO projectFinanceReviewDTO) {
+        projectService.projectFinanceReview(projectFinanceReviewDTO);
         return Result.success();
     }
 

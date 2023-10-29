@@ -14,7 +14,10 @@ public class MessageConstant {
     public static final String EDIT_FAILED = "修改失败";
     public static final String EDIT_FAILED_EMPTY = "修改字段为空";
     public static final String PROJECT_DEADLINE_FIELD_EMPTY = "修改字段为空";
-
+    public static final String PROJECT_ADD_FAILED_PRINCIPAL_NOT_MATCH = "项目申报失败：项目负责人与申请人不匹配";
+    public static final String PROJECT_ADD_FAILED_CATEGORY_NOT_TRUE = "项目申报失败：category错误";
+    public static final String FINANCE_ADD_FAILED_PRINCIPAL_NOT_MATCH = "报销申请失败：项目负责人与申请人不匹配";
+    public static final String FINANCE_UPDATE_FAILED_ID_NUMBER_NOT_MATCH = "报销处理失败：项目ID和项目编号不一致";
 
     public static final String DEADLINE_NOT_INSERT = "未添加时间线";
 

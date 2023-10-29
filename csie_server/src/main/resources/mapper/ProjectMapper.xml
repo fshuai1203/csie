@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fshuai.mapper.ProjectMapper">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO project ( name, category, teacher_id,teacher_name, principal_id,principal_name, mentor_id,
+        begin_time, end_time, description,
+        attachments, type, state, dept_id, number )
+        VALUES
+        (#{name},#{category},#{teacherId},#{teacherName},#{principalId},#{principalName},
+        #{mentorId},#{beginTime},#{endTime},#{description},
+        #{attachments},#{type},#{state},#{deptId},#{number})
+    </insert>
+    <select id="selectByPrincipalId" resultType="com.fshuai.entity.Project">
+        select *
+        from project
+        where principal_id = #{principalId}
+    </select>
+    <select id="selectByIds" resultType="com.fshuai.entity.Project">
+        select * from project where id in
+        <foreach collection="projectIds" open="(" close=")" separator="," item="projectId">
+            #{projectId}
+        </foreach>
+    </select>
+    <select id="selectById" resultType="com.fshuai.entity.Project">
+        select * from project where id = #{projectId}
+    </select>
+</mapper>

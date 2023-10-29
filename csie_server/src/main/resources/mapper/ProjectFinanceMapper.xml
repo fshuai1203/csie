@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fshuai.mapper.ProjectFinanceMapper">
+    <insert id="insert">
+        insert into
+        project_finance(finance_number,project_id,price,apply_time,attachments,project_name,type,dept_id,principal_name,state)
+        values(#{financeNumber},#{projectId},#{price},#{applyTime},#{attachments},#{projectName},#{type},#{deptId},#{principalName},#{state})
+    </insert>
+    <update id="update">
+        update project_finance
+        <set>
+            <if test="description != null and description!=''">
+                description=#{description},
+            </if>
+            <if test="state != null">
+                state=#{state},
+            </if>
+            <if test="processor != null">
+                processor=#{processor},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+    <select id="pageQuery" resultType="com.fshuai.entity.ProjectFinance">
+        select * from project_finance
+        <where>
+            <if test="applyTime != null and applyTime!='' ">
+                and apply_time = #{applyTime}
+            </if>
+            <if test="type != null and type!='' ">
+                and type = #{type}
+            </if>
+            <if test="deptId != null">
+                and dept_id = #{deptId}
+            </if>
+            <if test="projectName != null and projectName!='' ">
+                and project_name = #{projectName}
+            </if>
+            <if test="state != null ">
+                and state = #{state}
+            </if>
+        </where>
+    </select>
+    <select id="selectByProjectIdAndFinanceNumber" resultType="com.fshuai.entity.ProjectFinance">
+        select *
+        from project_finance
+        where project_id = #{projectId}
+          and finance_number = #{financeNumber}
+    </select>
+
+
+</mapper>

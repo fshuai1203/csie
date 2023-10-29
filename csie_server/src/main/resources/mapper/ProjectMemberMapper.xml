@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fshuai.mapper.ProjectMemberMapper">
+    <insert id="insertByMembersAndProjectId">
+        INSERT INTO project_member (project_id,member_id,id_number, job,member_name)
+        VALUES
+        <foreach collection="members" item="member" separator=",">
+            (#{projectId},#{member.id},#{member.idNumber},#{member.job},#{member.name})
+        </foreach>
+    </insert>
+    <select id="selectByMemberId" resultType="com.fshuai.entity.ProjectMember">
+        select *
+        from project_member
+        where member_id = #{memberId}
+    </select>
+    <select id="selectProjectIdsByMemberId" resultType="java.lang.Integer">
+        select project_id
+        from project_member
+        where member_id = #{memberId}
+    </select>
+
+</mapper>

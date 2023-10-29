@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 public class ProjectMemberDTO {
 
-    private Integer id;
+    private Integer projectId;
 
     private List<MemberDTO> members;
 

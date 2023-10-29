@@ -9,9 +9,9 @@ public class MemberDTO {
 
     private Integer id;
 
-    private Integer memberId;
-
+    private String idNumber;
 
     private String job;
 
+    private String name;
 }

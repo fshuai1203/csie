@@ -13,7 +13,7 @@ public interface ProjectService {
 
     void review(ProjectReviewDTO projectReviewDTO);
 
-    void getProjectFinance(ProjectFinancePageDTO projectFinancePageDTO);
+    PageResult getProjectFinance(ProjectFinancePageDTO projectFinancePageDTO);
 
     void getProjectAttachmentsById(HttpServletResponse response, Integer id);
 
@@ -31,4 +31,6 @@ public interface ProjectService {
 
 
     void addProjectFinance(ProjectFinanceDTO projectFinanceDTO);
+
+    void projectFinanceReview(ProjectFinanceReviewDTO projectFinanceReviewDTO);
 }
