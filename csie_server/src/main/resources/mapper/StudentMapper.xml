@@ -44,4 +44,17 @@
         from student
         where id = #{studentID}
     </select>
+    <select id="selectStudentVoById" resultType="com.fshuai.vo.StudentVO">
+        select *
+        from student
+        where id = #{studentID}
+    </select>
+    <select id="selectStudentVoByIds" resultType="com.fshuai.vo.StudentVO">
+        select *
+        from student
+        where id in
+        <foreach collection="memberIds" item="memberId" separator="," open="(" close=")">
+            #{memberId}
+        </foreach>
+    </select>
 </mapper>

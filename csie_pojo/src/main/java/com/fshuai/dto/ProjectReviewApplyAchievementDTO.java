@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectReviewAttachmentsDTO {
+public class ProjectReviewApplyAchievementDTO {
 
     // 项目Id
     private Integer projectId;

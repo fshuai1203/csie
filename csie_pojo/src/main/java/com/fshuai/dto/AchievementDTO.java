@@ -7,39 +7,17 @@ import lombok.Data;
 @Data
 public class AchievementDTO {
 
-    private Page page;
+    // 论文
+    private PaperDTO paperDTO;
 
-    private String content;
+    // 专利
+    private PatentDTO patentDTO;
 
+    // 实体作品
+    private PhysicalProjectDTO physicalProjectDTO;
+
+    // 添加附件
     private String attachments;
 
 }
 
-class Page {
-
-    private String pageName;
-    private String journalName;
-
-    private String searchType;
-
-    private String searchNumber;
-
-    private String firstAuthor;
-
-}
-
-class Patent {
-    private String patentName;
-
-    private String AuthorizationDate;
-
-    private String patentNumber;
-
-}
-
-class PhysicalProject {
-    private String projectName;
-
-    private String firstAuthor;
-
-}

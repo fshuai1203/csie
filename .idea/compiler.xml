@@ -15,6 +15,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="csie" options="-parameters" />
       <module name="csie_common" options="-parameters" />
       <module name="csie_pojo" options="-parameters" />
       <module name="csie_server" options="-parameters" />

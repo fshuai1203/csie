@@ -23,9 +23,9 @@ public interface ProjectService {
 
     void addProject(ProjectApplyDTO projectApplyDTO);
 
-    PageResult getReviewProjects(Integer state);
+    PageResult getReviewProjects(ProjectReviewPageQueryDTO pageQueryDTO);
 
-    void reviewProject(ProjectReviewAttachmentsDTO attachmentsDTO);
+    void applyReview(ProjectReviewApplyDTO reviewApplyDTO);
 
     void updateMember(ProjectMemberDTO projectMemberDTO);
 
@@ -33,4 +33,6 @@ public interface ProjectService {
     void addProjectFinance(ProjectFinanceDTO projectFinanceDTO);
 
     void projectFinanceReview(ProjectFinanceReviewDTO projectFinanceReviewDTO);
+
+    void applyCompletionReview(ProjectReviewApplyAchievementDTO attachmentsDTO);
 }

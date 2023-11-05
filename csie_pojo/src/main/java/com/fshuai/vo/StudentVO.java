@@ -5,7 +5,7 @@ import lombok.Data;
 
 
 @Data
-public class ProjectMemberVO {
+public class StudentVO {
 
     private Integer id;
     private String name;

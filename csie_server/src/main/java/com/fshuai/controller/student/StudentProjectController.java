@@ -35,8 +35,16 @@ public class StudentProjectController {
 
     @PostMapping("/review")
     @ApiOperation("提交审核报告")
-    public Result applyProject(@RequestBody ProjectReviewAttachmentsDTO attachmentsDTO) {
-        projectService.reviewProject(attachmentsDTO);
+    public Result applyProject(@RequestBody ProjectReviewApplyDTO reviewApplyDTO) {
+        projectService.applyReview(reviewApplyDTO);
+        return Result.success();
+    }
+
+    @PostMapping("/review/end")
+    @ApiOperation("提交结项审核，需要额外提供材料")
+    public Result applyCompletionProject(@RequestBody ProjectReviewApplyAchievementDTO attachmentsDTO) {
+        // 检查结项项目，要额外处理材料
+        projectService.applyCompletionReview(attachmentsDTO);
         return Result.success();
     }
 

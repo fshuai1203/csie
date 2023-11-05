@@ -18,4 +18,6 @@ public interface ProjectMemberMapper {
 
     @Delete("delete from project_member where project_id = #{projectId}")
     void deleteByProjectId(Integer projectId);
+
+    List<Integer> selectMemberIdsByProjectId(Integer projectId);
 }

@@ -1,24 +1,27 @@
 package com.fshuai.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fshuai.constant.*;
 import com.fshuai.context.StudentBaseContext;
 import com.fshuai.context.TeacherBaseContext;
 import com.fshuai.dto.*;
 import com.fshuai.entity.Project;
 import com.fshuai.entity.ProjectFinance;
+import com.fshuai.entity.ProjectReview;
+import com.fshuai.exception.AnnouncementNotAllowedException;
 import com.fshuai.exception.StudentProjectException;
 import com.fshuai.exception.TeacherProjectException;
-import com.fshuai.mapper.ProjectFinanceMapper;
-import com.fshuai.mapper.ProjectMapper;
-import com.fshuai.mapper.ProjectMemberMapper;
-import com.fshuai.mapper.StudentMapper;
+import com.fshuai.mapper.*;
 import com.fshuai.properties.JwtProperties;
 import com.fshuai.result.PageResult;
 import com.fshuai.service.ProjectService;
 import com.fshuai.utils.IdWorker;
 import com.fshuai.vo.ProjectDetailVO;
+import com.fshuai.vo.ProjectPageVO;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,11 +29,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@Slf4j
 public class ProjectServiceImpl implements ProjectService {
 
     @Autowired
@@ -45,26 +51,113 @@ public class ProjectServiceImpl implements ProjectService {
     @Autowired
     ProjectMemberMapper projectMemberMapper;
 
+
     @Autowired
     ProjectFinanceMapper projectFinanceMapper;
 
     @Autowired
     JwtProperties jwtProperties;
 
+    @Autowired
+    ProjectReviewMapper projectReviewMapper;
+
+    /**
+     * 教师端查询项目
+     *
+     * @param projectPageQueryDTO
+     * @return
+     */
     @Override
     public PageResult pageQuery(ProjectPageQueryDTO projectPageQueryDTO) {
-        return null;
+        // 检查老师权限
+        Map map = checkTeacherRole();
+        Integer teacherRole = getTeacherRoleByMap(map);
+        Integer teacherDept = getTeacherDeptByMap(map);
+        // 系级负责人只能查看本系的项目
+        if (teacherRole == RoleConstant.DEPARTMENT_HEAD) {
+            projectPageQueryDTO.setDeptId(teacherDept);
+        }
+        // 根据projectPageQueryDTO查询项目
+        PageHelper.startPage(projectPageQueryDTO.getPage(), projectPageQueryDTO.getPageSize());
+        Page<ProjectPageVO> page = projectMapper.pageQuery(projectPageQueryDTO);
+        return new PageResult(page.getTotal(), page.getResult());
     }
 
+    /**
+     * 教师端根据Id获取项目详细信息
+     *
+     * @param id
+     * @return
+     */
     @Override
     public ProjectDetailVO detail(Integer id) {
-        return null;
+        Project project = checkProjectIsNotNull(id);
+        ProjectDetailVO projectDetailVO = ProjectDetailVO.builder().build();
+        BeanUtils.copyProperties(project, projectDetailVO);
+        // 补全负责人信息以及小组成员信息
+        // 补全负责人
+        projectDetailVO.setPrincipal(studentMapper.selectStudentVoById(project.getPrincipalId()));
+        // 补全小组成员
+        List<Integer> memberIds = projectMemberMapper.selectMemberIdsByProjectId(id);
+        projectDetailVO.setProjectMembers(studentMapper.selectStudentVoByIds(memberIds));
+        return projectDetailVO;
     }
 
+    /**
+     * 教师审核
+     *
+     * @param projectReviewDTO
+     */
     @Override
     public void review(ProjectReviewDTO projectReviewDTO) {
-
+        //:todo 利用切片检查字段
+        // 检查教师权限
+        Map map = checkTeacherRole();
+        // 检查项目Id是否正确
+        Project project = checkProjectIsNotNull(projectReviewDTO.getProjectId());
+        // 检查是否是系级教师是否是审核了自己系的项目,校级教师不用审核
+        Integer teacherRole = getTeacherRoleByMap(map);
+        Integer teacherDept = getTeacherDeptByMap(map);
+        if (teacherRole == RoleConstant.DEPARTMENT_HEAD && teacherDept != project.getDeptId()) {
+            throw new TeacherProjectException(MessageConstant.ROLE_FAILED);
+        }
+        // 进行项目审核，所提交的state要比project中的state大1或2
+        // 审核通过
+        // 如果同意approval为true，state大2，否则错误
+        // 获取项目状态
+        Integer oldState = project.getState();
+        Integer newState = projectReviewDTO.getState();
+        if (projectReviewDTO.isApproval() && newState - oldState == 2) {
+            // 获取对应项目待审核记录
+            ProjectReview projectReview = projectReviewMapper.selectByProjectIdAndState(projectReviewDTO.getProjectId(), oldState);
+            // 更新ProjectReview
+            BeanUtils.copyProperties(projectReviewDTO, projectReview);
+            projectReviewMapper.updateProjectReview(projectReview);
+            newState = oldState + 2;
+        }
+        // 审核失败
+        // 如果不同意approval为false，state大1，否则错误
+        // 审核失败需要重新提交材料，因此project的state由提交材料待审核变为待提交材料
+        else if (!projectReviewDTO.isApproval() && newState - oldState == 1) {
+            // 获取对应项目待审核记录
+            ProjectReview projectReview = projectReviewMapper.selectByProjectIdAndState(projectReviewDTO.getProjectId(), oldState);
+            // 更新ProjectReview
+            BeanUtils.copyProperties(projectReviewDTO, projectReview);
+            projectReviewMapper.updateProjectReview(projectReview);
+            newState = oldState - 1;
+        } else {
+            throw new TeacherProjectException(MessageConstant.PROJECT_REVIEW_FAILED_STATE_NOT_MATCH);
+        }
+        // 更新project中的state，如果失败，则state减1（待提交材料），如果成功state加2（进入下一个状态）
+        // 更新Project
+        Project updateProject = Project
+                .builder()
+                .id(project.getId())
+                .state(newState)
+                .build();
+        projectMapper.update(updateProject);
     }
+
 
     /**
      * 教师端查看项目报销申请
@@ -99,6 +192,7 @@ public class ProjectServiceImpl implements ProjectService {
         projectFinanceMapper.update(projectFinance);
     }
 
+
     /**
      * 检查获财务报销人的身份，只有校级负责人才可以获得报销
      */
@@ -113,16 +207,6 @@ public class ProjectServiceImpl implements ProjectService {
             throw new TeacherProjectException(MessageConstant.ROLE_FAILED);
         }
         return teacherId;
-    }
-
-    @Override
-    public void getProjectAttachmentsById(HttpServletResponse response, Integer id) {
-
-    }
-
-    @Override
-    public void getProjectAttachments(HttpServletResponse response, AttachmentPageDTO attachmentPageDTO) {
-
     }
 
     /**
@@ -147,6 +231,33 @@ public class ProjectServiceImpl implements ProjectService {
         return pageResult;
     }
 
+
+    /**
+     * 教师根据项目状态获取相应的项目
+     *
+     * @param pageQueryDTO
+     * @return
+     */
+    @Override
+    public PageResult getReviewProjects(ProjectReviewPageQueryDTO pageQueryDTO) {
+        // 检查教师权限
+        Map map = checkTeacherRole();
+        Integer teacherRole = getTeacherRoleByMap(map);
+        Integer teacherDept = getTeacherDeptByMap(map);
+        // 系级负责人只能获取本系的项目
+        // 校级负责人可以获取所有的项目
+        // 将states转换为数组
+        List<String> statesList = Arrays.asList(pageQueryDTO.getStates().split(","));
+        List<Integer> states = statesList.stream().map(Integer::valueOf).collect(Collectors.toList());
+
+        PageHelper.startPage(pageQueryDTO.getPage(), pageQueryDTO.getPageSize());
+        Page<ProjectPageVO> projectFinances = projectMapper.
+                reviewPageQuery(states, teacherRole == RoleConstant.SCHOOL_HEAD ? null : teacherDept);
+        PageResult pageResult = new PageResult();
+        pageResult.setRecords(projectFinances);
+        pageResult.setTotal(projectFinances.size());
+        return pageResult;
+    }
 
     /**
      * 学生添加自己的项目
@@ -186,23 +297,70 @@ public class ProjectServiceImpl implements ProjectService {
         List<MemberDTO> members = projectApplyDTO.getMembers();
         // 插入项目成员
         projectMemberMapper.insertByMembersAndProjectId(members, projectId);
+        // 将提交记录保存到project_review中
+        ProjectReviewApplyDTO reviewApplyDTO = ProjectReviewApplyDTO
+                .builder()
+                .projectId(projectId)
+                .state(project.getState())
+                .attachments(projectApplyDTO.getAttachments())
+                .build();
+        projectReviewMapper.insert(reviewApplyDTO);
 
-    }
-
-    @Override
-    public PageResult getReviewProjects(Integer state) {
-        return null;
     }
 
     /**
-     * 提交审核报告
+     * 学生提交审核报告
      *
-     * @param attachmentsDTO
+     * @param reviewApplyDTO
      */
     @Override
-    public void reviewProject(ProjectReviewAttachmentsDTO attachmentsDTO) {
-
+    public void applyReview(ProjectReviewApplyDTO reviewApplyDTO) {
+        // 根据项目Id检查项目状态,并检查项目负责人Id和申请人Id
+        Project project = checkProjectPrincipal(reviewApplyDTO.getProjectId());
+        // 检查项目状态与所提交的状态是否一致，从而确保申请人所提交材料正确
+        if (project.getState() != reviewApplyDTO.getState()) {
+            throw new StudentProjectException(MessageConstant.PROJECT_ID_FAILED);
+        }
+        // 更新项目状态为待检查状态，并将本次提交保存到project_review中记录
+        reviewApplyDTO.setState(project.getState() + 1);
+        projectReviewMapper.insert(reviewApplyDTO);
+        // 更新项目表中的项目状态
+        // 材料提交成功，由待提交材料状态转变为材料提交成功，待审核
+        Project updataProject = Project
+                .builder()
+                .id(project.getId())
+                .state(project.getState() + 1)
+                .build();
+        projectMapper.update(updataProject);
     }
+
+    /**
+     * 学生结项审核，需要额外提交材料, 其余和申请审核一致
+     *
+     * @param achievementDTO
+     */
+    @Override
+    public void applyCompletionReview(ProjectReviewApplyAchievementDTO achievementDTO) {
+        // 审核报告
+        ProjectReviewApplyDTO applyDTO = new ProjectReviewApplyDTO();
+        BeanUtils.copyProperties(achievementDTO, applyDTO);
+        applyReview(applyDTO);
+        // 处理attachmentsDTO，将其转换为JSON格式的string文件进行存储
+        // 使用jackson进行转换
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String achievement = objectMapper.writeValueAsString(achievementDTO.getAchievement());
+            Project project = Project
+                    .builder()
+                    .id(achievementDTO.getProjectId())
+                    .achievement(achievement)
+                    .build();
+            projectMapper.update(project);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     /**
      * 更改项目成员
@@ -248,6 +406,28 @@ public class ProjectServiceImpl implements ProjectService {
         projectFinanceMapper.insert(projectFinance);
     }
 
+    /**
+     * 根据项目Id获取附件
+     *
+     * @param response
+     * @param id
+     */
+    @Override
+    public void getProjectAttachmentsById(HttpServletResponse response, Integer id) {
+        //:todo 根据项目Id获取附件
+    }
+
+    /**
+     * 根据附件条件获取一定数量的附件
+     *
+     * @param response
+     * @param attachmentPageDTO
+     */
+    @Override
+    public void getProjectAttachments(HttpServletResponse response, AttachmentPageDTO attachmentPageDTO) {
+        //:todo 根据附件条件获取一定数量的附件
+    }
+
 
     /**
      * 检查项目负责人和项目申请人是否一致
@@ -262,5 +442,43 @@ public class ProjectServiceImpl implements ProjectService {
             throw new StudentProjectException(MessageConstant.FINANCE_ADD_FAILED_PRINCIPAL_NOT_MATCH);
         }
         return project;
+    }
+
+    /**
+     * 检查教师是否是管理员
+     *
+     * @return 教师信息Map
+     */
+    private Map checkTeacherRole() {
+        // 获取当前用户的权限
+        Map teacherMap = TeacherBaseContext.getCurrentTeacher();
+        // 获取当前用户的身份
+        Integer teacherRole = (Integer) teacherMap.get(jwtProperties.getTeacherRoleKey());
+        // 只有负责人才能更改此项
+        if (teacherRole != RoleConstant.SCHOOL_HEAD && teacherRole != RoleConstant.DEPARTMENT_HEAD) {
+            throw new AnnouncementNotAllowedException(MessageConstant.ROLE_FAILED);
+        }
+        return teacherMap;
+    }
+
+    private Project checkProjectIsNotNull(Integer projectId) {
+        Project project = projectMapper.selectById(projectId);
+        // 如果项目为空则说明projectId错误
+        if (project == null) {
+            throw new TeacherProjectException(MessageConstant.PROJECT_ID_FAILED);
+        }
+        return project;
+    }
+
+    private Integer getTeacherRoleByMap(Map map) {
+        return getTeacherRoleByMap(map);
+    }
+
+    private Integer getTeacherIdByMap(Map map) {
+        return (Integer) map.get(jwtProperties.getTeacherIdKey());
+    }
+
+    private Integer getTeacherDeptByMap(Map map) {
+        return getTeacherDeptByMap(map);
     }
 }

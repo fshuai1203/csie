@@ -10,6 +10,39 @@
         #{mentorId},#{beginTime},#{endTime},#{description},
         #{attachments},#{type},#{state},#{deptId},#{number})
     </insert>
+    <update id="update">
+        update project
+        <set>
+            <if test="name != null and name!='' ">
+                name=#{name},
+            </if>
+            <if test="category != null">
+                category=#{category},
+            </if>
+            <if test="type != null">
+                type=#{type},
+            </if>
+            <if test="deptId != null">
+                dept_id=#{deptId},
+            </if>
+            <if test="endTime != null">
+                end_time=#{endTime},
+            </if>
+            <if test="description != null and description!=''">
+                description=#{description},
+            </if>
+            <if test="attachments != null and attachments!=''">
+                attachments=#{attachments},
+            </if>
+            <if test="achievement != null and achievement!=''">
+                achievement=#{achievement},
+            </if>
+            <if test="state != null">
+                state=#{state},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
     <select id="selectByPrincipalId" resultType="com.fshuai.entity.Project">
         select *
         from project
@@ -22,6 +55,45 @@
         </foreach>
     </select>
     <select id="selectById" resultType="com.fshuai.entity.Project">
-        select * from project where id = #{projectId}
+        select *
+        from project
+        where id = #{projectId}
     </select>
+    <select id="pageQuery" resultType="com.fshuai.vo.ProjectPageVO">
+        select *
+        from project
+        <where>
+            <if test="beginTime != null and beginTime!='' ">
+                and begin_time = #{beginTime}
+            </if>
+            <if test="name != null and name!='' ">
+                and name = #{name}
+            </if>
+            <if test="deptId != null">
+                and dept_id=#{deptId}
+            </if>
+            <if test="type != null">
+                and type=#{type}
+            </if>
+            <if test="state != null">
+                and state=#{state}
+            </if>
+        </where>
+    </select>
+    <select id="reviewPageQuery" resultType="com.fshuai.vo.ProjectPageVO">
+        select *
+        from project
+        <where>
+            <if test="deptId != null">
+                and dept_id=#{deptId}
+            </if>
+            <if test="states != null">
+                and state in
+                <foreach collection="states" separator="," item="state" open="(" close=")">
+                    #{state}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
 </mapper>

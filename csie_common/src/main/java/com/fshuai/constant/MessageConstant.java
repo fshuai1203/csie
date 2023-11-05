@@ -11,10 +11,13 @@ public class MessageConstant {
     public static final String PASSWORD_ERROR = "密码错误";
     public static final String OLD_PASSWORD_ERROR = "旧密码错误";
     public static final String ROLE_FAILED = "当前用户无权限";
+    public static final String PROJECT_ID_FAILED = "projectId 错误";
+    public static final String STATE_FAILED = "项目提交状态 错误";
     public static final String EDIT_FAILED = "修改失败";
     public static final String EDIT_FAILED_EMPTY = "修改字段为空";
     public static final String PROJECT_DEADLINE_FIELD_EMPTY = "修改字段为空";
     public static final String PROJECT_ADD_FAILED_PRINCIPAL_NOT_MATCH = "项目申报失败：项目负责人与申请人不匹配";
+    public static final String PROJECT_REVIEW_FAILED_STATE_NOT_MATCH = "项目审核失败：state字段不匹配";
     public static final String PROJECT_ADD_FAILED_CATEGORY_NOT_TRUE = "项目申报失败：category错误";
     public static final String FINANCE_ADD_FAILED_PRINCIPAL_NOT_MATCH = "报销申请失败：项目负责人与申请人不匹配";
     public static final String FINANCE_UPDATE_FAILED_ID_NUMBER_NOT_MATCH = "报销处理失败：项目ID和项目编号不一致";

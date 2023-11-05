@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.List;
 
 
@@ -28,9 +27,9 @@ public class ProjectDetailVO {
     private String teacherName;
 
     // 负责人信息
-    private ProjectMemberVO principal;
+    private StudentVO principal;
 
-    private List<ProjectMemberVO> projectMembers;
+    private List<StudentVO> projectMembers;
 
     // 校外指导人
     private Integer mentorId;

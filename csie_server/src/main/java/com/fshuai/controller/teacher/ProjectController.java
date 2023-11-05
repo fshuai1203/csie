@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 @RestController
 @RequestMapping("/teacher/project")
@@ -24,15 +25,15 @@ public class ProjectController {
 
     @GetMapping("/page")
     @ApiOperation("项目查询")
-    public Result<PageResult> getProjects(@RequestBody ProjectPageQueryDTO projectPageQueryDTO) {
+    public Result<PageResult> getProjects(ProjectPageQueryDTO projectPageQueryDTO) {
         PageResult pageResult = projectService.pageQuery(projectPageQueryDTO);
         return Result.success(pageResult);
     }
 
-    @GetMapping("/review/{state}")
+    @GetMapping("/review")
     @ApiOperation("获取待审核的项目")
-    public Result<PageResult> getProjects(@PathVariable Integer state) {
-        PageResult pageResult = projectService.getReviewProjects(state);
+    public Result<PageResult> getProjects(ProjectReviewPageQueryDTO pageQueryDTO) {
+        PageResult pageResult = projectService.getReviewProjects(pageQueryDTO);
         return Result.success(pageResult);
     }
 

@@ -18,5 +18,10 @@
         from project_member
         where member_id = #{memberId}
     </select>
+    <select id="selectMemberIdsByProjectId" resultType="java.lang.Integer">
+        SELECT member_id
+        FROM project_member
+        WHERE project_id = #{projectId}
+    </select>
 
 </mapper>

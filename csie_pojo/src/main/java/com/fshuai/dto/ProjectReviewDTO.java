@@ -11,14 +11,13 @@ import java.util.Date;
 @Data
 public class ProjectReviewDTO {
 
-  private Integer id;
   // 项目Id
   private Integer projectId;
-  // 项目状态，包括待立项审核，待中期审核，待结项审核，待延期审核
+  // 项目状态，项目未通过state在原先state的基础上加1，项目通过在原先state的基础上加2
   private Integer state;
   // 项目分数
   private double score;
-  // 项目通过与否
+  // 项目通过与否，教师端必须指定
   private boolean approval;
   // 项目不通过原因
   private String result;

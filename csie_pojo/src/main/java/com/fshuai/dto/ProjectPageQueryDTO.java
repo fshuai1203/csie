@@ -7,7 +7,7 @@ import java.time.LocalDate;
 @Data
 public class ProjectPageQueryDTO {
 
-    private LocalDate beginTime;
+    private String beginTime;
     private Integer deptId;
     private String name;
     // 项目类型，包括校级或国家级等
