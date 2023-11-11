@@ -20,6 +20,9 @@ public class MessageConstant {
     public static final String PROJECT_REVIEW_FAILED_STATE_NOT_MATCH = "项目审核失败：state字段不匹配";
     public static final String PROJECT_ADD_FAILED_CATEGORY_NOT_TRUE = "项目申报失败：category错误";
     public static final String FINANCE_ADD_FAILED_PRINCIPAL_NOT_MATCH = "报销申请失败：项目负责人与申请人不匹配";
+    public static final String FILE_ADD_FAILED_PRINCIPAL_NOT_MATCH = "文件上传失败：项目负责人与申请人不匹配";
+    public static final String FILE_ADD_FAILED_STATE_FALSE = "文件上传失败：当前项目无需上传文档";
+    public static final String FILE_ADD_FAILED_FILE_EMPTY = "文件上传失败：上传文件失败";
     public static final String FINANCE_UPDATE_FAILED_ID_NUMBER_NOT_MATCH = "报销处理失败：项目ID和项目编号不一致";
 
     public static final String DEADLINE_NOT_INSERT = "未添加时间线";

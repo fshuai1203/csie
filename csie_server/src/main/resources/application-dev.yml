@@ -1,4 +1,4 @@
-sky:
+csie:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     host: localhost
@@ -6,6 +6,11 @@ sky:
     database: csie
     username: root
     password: fshuai1203
+  alioss:
+    endpoint: oss-cn-beijing.aliyuncs.com
+    accessKeyId: LTAI5tPQn7nMwADVTtkkEDbv
+    accessKeySecret: en00507oc36uua85xyzKsA9S8LgZFM
+    bucketName: csie
   redis:
     host: localhost
     port: 6379
@@ -15,6 +20,7 @@ sky:
     multipart:
       max-request-size: 300MB
       max-file-size: 30MB
+
 
 document:
   uploadPath: /Users/fengshuai/Documents/project/java/spring/csie/data/images

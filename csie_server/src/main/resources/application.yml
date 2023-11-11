@@ -1,6 +1,5 @@
 server:
   port: 8080
-
 spring:
   profiles:
     active: dev
@@ -14,14 +13,14 @@ spring:
     allow-circular-references: true
   datasource:
     druid:
-      driver-class-name: ${sky.datasource.driver-class-name}
-      url: jdbc:mysql://${sky.datasource.host}:${sky.datasource.port}/${sky.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
-      username: ${sky.datasource.username}
-      password: ${sky.datasource.password}
+      driver-class-name: ${csie.datasource.driver-class-name}
+      url: jdbc:mysql://${csie.datasource.host}:${csie.datasource.port}/${csie.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      username: ${csie.datasource.username}
+      password: ${csie.datasource.password}
   servlet:
     multipart:
-      max-request-size: ${sky.servlet.multipart.max-request-size}
-      max-file-size: ${sky.servlet.multipart.max-file-size}
+      max-request-size: ${csie.servlet.multipart.max-request-size}
+      max-file-size: ${csie.servlet.multipart.max-file-size}
 
 mybatis:
   #mapper配置文件
@@ -55,8 +54,12 @@ fshuai:
     student-secret-key: fshuai
     student-ttl: 7200000
     student-token-name: student-token
+  alioss:
+    endpoint: ${csie.alioss.endpoint}
+    access-key-id: ${csie.alioss.accessKeySecret}
+    access-key-secret: ${csie.alioss.accessKeyId}
+    bucket-name: ${csie.alioss.bucketName}
 
 document:
   uploadPath: ${document.uploadPath}
-
 

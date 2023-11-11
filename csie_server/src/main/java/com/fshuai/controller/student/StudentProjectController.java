@@ -1,14 +1,19 @@
 package com.fshuai.controller.student;
 
 import com.fshuai.dto.*;
+import com.fshuai.entity.Project;
 import com.fshuai.result.PageResult;
 import com.fshuai.result.Result;
+import com.fshuai.service.FileService;
 import com.fshuai.service.ProjectService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.fshuai.utils.AliOssUtil;
+import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
 
 @RestController
 @RequestMapping("/student/project")
@@ -18,6 +23,9 @@ public class StudentProjectController {
 
     @Autowired
     ProjectService projectService;
+
+    @Autowired
+    FileService fileService;
 
     @GetMapping("/page")
     @ApiOperation("查询自己参加的项目")
@@ -62,4 +70,16 @@ public class StudentProjectController {
         return Result.success();
     }
 
+    @PostMapping("/upload")
+    @ApiOperation("上传文件")
+    public Result uploadFile(Integer projectId, MultipartFile file) {
+        fileService.uploadFile(projectId,file);
+        return Result.success();
+    }
+
+//    @PostMapping("/upload")
+//    @ApiOperation("上传文件")
+//    public Result uploadFile(Integer projectId,  File file) {
+//        return Result.success();
+//    }
 }
