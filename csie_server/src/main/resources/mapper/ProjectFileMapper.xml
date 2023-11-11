@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.fshuai.mapper.ProjectFileMapper">
-    <insert id="insert">
+    <insert id="insertProjectFile"  useGeneratedKeys="true" keyProperty="id" >
         insert into project_file(name, state, url)
         VALUES (#{name}, #{state}, #{url})
     </insert>
-    <select id="getCountLikeName" resultType="java.lang.Integer">
-        SELECT count(*)
-        FROM project_file
-        WHERE name like concat('%', #{fileName}, '%');
-    </select>
+    <delete id="deleteLikeName">
+        delete
+        from project_file
+        where name like concat(#{name}, '%')
+    </delete>
 </mapper>

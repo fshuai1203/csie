@@ -15,8 +15,10 @@ import com.fshuai.exception.TeacherProjectException;
 import com.fshuai.mapper.*;
 import com.fshuai.properties.JwtProperties;
 import com.fshuai.result.PageResult;
+import com.fshuai.service.FileService;
 import com.fshuai.service.ProjectService;
 import com.fshuai.utils.IdWorker;
+import com.fshuai.utils.StringUtil;
 import com.fshuai.vo.ProjectDetailVO;
 import com.fshuai.vo.ProjectPageVO;
 import com.github.pagehelper.Page;
@@ -51,6 +53,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Autowired
     ProjectMemberMapper projectMemberMapper;
 
+    @Autowired
+    FileService fileService;
+
 
     @Autowired
     ProjectFinanceMapper projectFinanceMapper;
@@ -60,6 +65,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Autowired
     ProjectReviewMapper projectReviewMapper;
+
+    @Autowired
+    StringUtil stringUtil;
 
     /**
      * 教师端查询项目
@@ -127,13 +135,21 @@ public class ProjectServiceImpl implements ProjectService {
         // 获取项目状态
         Integer oldState = project.getState();
         Integer newState = projectReviewDTO.getState();
+        Project updateProject = Project
+                .builder()
+                .id(project.getId())
+                .build();
         if (projectReviewDTO.isApproval() && newState - oldState == 2) {
             // 获取对应项目待审核记录
             ProjectReview projectReview = projectReviewMapper.selectByProjectIdAndState(projectReviewDTO.getProjectId(), oldState);
             // 更新ProjectReview
             BeanUtils.copyProperties(projectReviewDTO, projectReview);
+            projectReview.setDate(LocalDate.now());
             projectReviewMapper.updateProjectReview(projectReview);
-            newState = oldState + 2;
+            updateProject.setState(oldState + 2);
+            if (projectReview.getAttachments() != null) {
+                updateProject.setAttachments(projectReview.getAttachments() + "," + project.getAttachments());
+            }
         }
         // 审核失败
         // 如果不同意approval为false，state大1，否则错误
@@ -143,18 +159,17 @@ public class ProjectServiceImpl implements ProjectService {
             ProjectReview projectReview = projectReviewMapper.selectByProjectIdAndState(projectReviewDTO.getProjectId(), oldState);
             // 更新ProjectReview
             BeanUtils.copyProperties(projectReviewDTO, projectReview);
+            projectReview.setDate(LocalDate.now());
             projectReviewMapper.updateProjectReview(projectReview);
-            newState = oldState - 1;
+            updateProject.setState(oldState - 1);
+            //删除相关材料以及projectFile的记录
+            fileService.deleteFile(project);
+
         } else {
             throw new TeacherProjectException(MessageConstant.PROJECT_REVIEW_FAILED_STATE_NOT_MATCH);
         }
         // 更新project中的state，如果失败，则state减1（待提交材料），如果成功state加2（进入下一个状态）
         // 更新Project
-        Project updateProject = Project
-                .builder()
-                .id(project.getId())
-                .state(newState)
-                .build();
         projectMapper.update(updateProject);
     }
 
@@ -297,15 +312,27 @@ public class ProjectServiceImpl implements ProjectService {
         List<MemberDTO> members = projectApplyDTO.getMembers();
         // 插入项目成员
         projectMemberMapper.insertByMembersAndProjectId(members, projectId);
-        // 将提交记录保存到project_review中
-        ProjectReviewApplyDTO reviewApplyDTO = ProjectReviewApplyDTO
-                .builder()
-                .projectId(projectId)
-                .state(project.getState())
-                .attachments(projectApplyDTO.getAttachments())
-                .build();
-        projectReviewMapper.insert(reviewApplyDTO);
+        insertProjectReview(project, projectApplyDTO.getAttachments());
 
+    }
+
+    /**
+     * 把项目和相应的附件进行绑定
+     *
+     * @param project
+     * @param attachments
+     */
+    private void insertProjectReview(Project project, List<String> attachments) {
+        // 将文件保存到file
+        List<Integer> ids = fileService.updateProjectFile(project, attachments);
+        // 将提交记录保存到project_review中
+        ProjectReview projectReview = ProjectReview
+                .builder()
+                .projectId(project.getId())
+                .state(project.getState())
+                .attachments(stringUtil.IntListTOString(ids))
+                .build();
+        projectReviewMapper.insert(projectReview);
     }
 
     /**
@@ -319,17 +346,20 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = checkProjectPrincipal(reviewApplyDTO.getProjectId());
         // 检查项目状态与所提交的状态是否一致，从而确保申请人所提交材料正确
         if (project.getState() != reviewApplyDTO.getState()) {
-            throw new StudentProjectException(MessageConstant.PROJECT_ID_FAILED);
+            throw new StudentProjectException(MessageConstant.STATE_FAILED);
         }
         // 更新项目状态为待检查状态，并将本次提交保存到project_review中记录
+        // 更新project的state为提交材料待审核
+        project.setState(project.getState() + 1);
         reviewApplyDTO.setState(project.getState() + 1);
-        projectReviewMapper.insert(reviewApplyDTO);
+        insertProjectReview(project, reviewApplyDTO.getAttachments());
+
         // 更新项目表中的项目状态
         // 材料提交成功，由待提交材料状态转变为材料提交成功，待审核
         Project updataProject = Project
                 .builder()
                 .id(project.getId())
-                .state(project.getState() + 1)
+                .state(project.getState())
                 .build();
         projectMapper.update(updataProject);
     }
@@ -471,7 +501,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     private Integer getTeacherRoleByMap(Map map) {
-        return getTeacherRoleByMap(map);
+        return (Integer) map.get(jwtProperties.getTeacherRoleKey());
     }
 
     private Integer getTeacherIdByMap(Map map) {
@@ -479,6 +509,6 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     private Integer getTeacherDeptByMap(Map map) {
-        return getTeacherDeptByMap(map);
+        return (Integer) map.get(jwtProperties.getTeacherDeptKey());
     }
 }

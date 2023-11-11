@@ -16,8 +16,5 @@ public class AchievementDTO {
     // 实体作品
     private PhysicalProjectDTO physicalProjectDTO;
 
-    // 添加附件
-    private String attachments;
-
 }
 

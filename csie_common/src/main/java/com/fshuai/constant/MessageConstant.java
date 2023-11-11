@@ -5,6 +5,9 @@ package com.fshuai.constant;
  */
 public class MessageConstant {
     public static final String REGISTER_FIELD_EMPTY = "注册字段为空";
+    public static final String STUDENT_ID_NUMBER_ERROR = "学生学号错误";
+    public static final String TEACHER_ID_NUMBER_ERROR = "学生学号错误";
+    public static final String REGISTER_FIELD_ILLEGAL = "非法注册";
     public static final String ID_NUMBER_HAS_EXISTS = "学号已经存在";
     public static final String LOGIN_FIELD_EMPTY = "登陆字段为空";
     public static final String LOGIN_FAILED = "当前用户未注册";
@@ -14,6 +17,7 @@ public class MessageConstant {
     public static final String PROJECT_ID_FAILED = "projectId 错误";
     public static final String STATE_FAILED = "项目提交状态 错误";
     public static final String EDIT_FAILED = "修改失败";
+    public static final String SYSTEM_INIT_FAILED = "系统初始化失败，当前系统存在用户";
     public static final String EDIT_FAILED_EMPTY = "修改字段为空";
     public static final String PROJECT_DEADLINE_FIELD_EMPTY = "修改字段为空";
     public static final String PROJECT_ADD_FAILED_PRINCIPAL_NOT_MATCH = "项目申报失败：项目负责人与申请人不匹配";

@@ -11,4 +11,6 @@ class PhysicalProjectDTO {
     // 第一作者
     private String firstAuthor;
 
+    private String uri;
+
 }

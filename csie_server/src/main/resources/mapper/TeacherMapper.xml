@@ -79,6 +79,23 @@
         </foreach>
         and (role = #{role} or dept_id != #{deptId})
     </select>
+    <select id="selectCount" resultType="java.lang.Integer">
+        select count(*)
+        from teacher
+    </select>
+    <select id="selectTeacherVOByIdNumber" resultType="com.fshuai.vo.TeacherVO">
+        SELECT t.id         id,
+               t.`name`     `name`,
+               t.id_number  id_number,
+               t.dept_id    dept_id,
+               t.major_name major_name,
+               t.role       role,
+               d.`name`     dept_name
+        FROM teacher t,
+             department d
+        where t.id_number = #{idNumber}
+          and t.dept_id = d.id
+    </select>
 
     <delete id="deleteBatchByIds">
         delete from teacher where id in

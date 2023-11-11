@@ -11,8 +11,10 @@ import com.fshuai.entity.Student;
 import com.fshuai.exception.LoginFailedException;
 import com.fshuai.exception.PasswordEditFailedException;
 import com.fshuai.exception.RegisterFailedException;
+import com.fshuai.exception.StudentProjectException;
 import com.fshuai.mapper.StudentMapper;
 import com.fshuai.service.StudentService;
+import com.fshuai.vo.StudentVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -150,5 +152,16 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public void logout() {
         //：todo 使jwt失效
+    }
+
+    @Override
+    public StudentVO getByIdNumber(String idNumber) {
+        Student student = studentMapper.selectByIdNumber(idNumber);
+        if (student == null) {
+            throw new StudentProjectException(MessageConstant.STUDENT_ID_NUMBER_ERROR);
+        }
+        StudentVO studentVO = StudentVO.builder().build();
+        BeanUtils.copyProperties(student, studentVO);
+        return studentVO;
     }
 }

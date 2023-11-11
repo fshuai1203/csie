@@ -1,6 +1,7 @@
 package com.fshuai.vo;
 
 
+import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class ProjectPageVO {
 
+    private Integer id;
     // 项目名称
     private String name;
     // 项目编号
@@ -48,5 +50,6 @@ public class ProjectPageVO {
     private Integer deptId;
     // 校级项目所属院系
     private String deptName;
+
 
 }

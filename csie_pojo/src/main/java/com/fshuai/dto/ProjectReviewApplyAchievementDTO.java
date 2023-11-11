@@ -22,6 +22,6 @@ public class ProjectReviewApplyAchievementDTO {
     // 项目成果，包括论文，专利，实物，通过json字段存储
     private AchievementDTO achievement;
     // 项目审核时提交的附件
-    private List<String> attachment;
+    private List<String> attachments;
 
 }

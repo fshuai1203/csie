@@ -41,8 +41,8 @@ public class StudentProjectController {
         return Result.success();
     }
 
-    @PostMapping("/review")
-    @ApiOperation("提交审核报告")
+    @PostMapping("/review/mid")
+    @ApiOperation("提交中期审核报告")
     public Result applyProject(@RequestBody ProjectReviewApplyDTO reviewApplyDTO) {
         projectService.applyReview(reviewApplyDTO);
         return Result.success();
@@ -72,14 +72,14 @@ public class StudentProjectController {
 
     @PostMapping("/upload")
     @ApiOperation("上传文件")
-    public Result uploadFile(Integer projectId, MultipartFile file) {
-        fileService.uploadFile(projectId,file);
-        return Result.success();
+    public Result<String> uploadFile(MultipartFile file) {
+        String url = fileService.uploadFile(file);
+        return Result.success("文件上传成功", url);
     }
-
+//
 //    @PostMapping("/upload")
 //    @ApiOperation("上传文件")
-//    public Result uploadFile(Integer projectId,  File file) {
+//    public Result uploadFile( File file) {
 //        return Result.success();
 //    }
 }

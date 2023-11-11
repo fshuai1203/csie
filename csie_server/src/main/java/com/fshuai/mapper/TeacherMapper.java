@@ -13,6 +13,7 @@ import java.util.List;
 @Mapper
 public interface TeacherMapper {
     Teacher selectByIdNumber(String idNumber);
+    TeacherVO selectTeacherVOByIdNumber(String idNumber);
 
     void insert(Teacher teacher);
 
@@ -25,4 +26,7 @@ public interface TeacherMapper {
     void deleteBatchByIds(List<Integer> ids);
 
     List<Teacher> selectByIdsCheckRoleOrNotDept(List<Integer> ids,Integer role,Integer deptId);
+
+    Integer selectCount();
+
 }

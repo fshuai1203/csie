@@ -11,7 +11,9 @@ import com.fshuai.service.StudentService;
 import com.fshuai.service.TeacherService;
 import com.fshuai.utils.JwtUtil;
 import com.fshuai.vo.StudentLoginVO;
+import com.fshuai.vo.StudentVO;
 import com.fshuai.vo.TeacherLoginVO;
+import com.fshuai.vo.TeacherVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +36,9 @@ public class StudentUserController {
 
     @Autowired
     JwtProperties jwtProperties;
+
+    @Autowired
+    TeacherService teacherService;
 
 
     @PostMapping("/login")
@@ -86,6 +91,20 @@ public class StudentUserController {
     public Result<String> logout() {
         studentService.logout();
         return Result.success();
+    }
+
+    @ApiOperation("根据学号查询学生")
+    @GetMapping("/search/student")
+    public Result<StudentVO> searchStudentByIdNumber(String idNumber) {
+        StudentVO studentVO = studentService.getByIdNumber(idNumber);
+        return Result.success(studentVO);
+    }
+
+    @ApiOperation("根据教职工号查询教师")
+    @GetMapping("/search/teacher")
+    public Result<TeacherVO> searchTeacherByIdNumber(String idNumber) {
+        TeacherVO teacherVO = teacherService.getByIdNumber(idNumber);
+        return Result.success(teacherVO);
     }
 
 

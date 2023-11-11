@@ -14,9 +14,10 @@ import java.util.List;
 @Mapper
 public interface ProjectReviewMapper {
 
-    void insert(ProjectReviewApplyDTO reviewApplyDTO);
+    void insert(ProjectReview reviewApplyDTO);
 
     ProjectReview selectByProjectIdAndState(Integer projectId, Integer state);
 
+    //:todo
     void updateProjectReview(ProjectReview projectReview);
 }

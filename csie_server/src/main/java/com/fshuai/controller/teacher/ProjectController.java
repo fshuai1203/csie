@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/teacher/project")
-@Api(tags = "项目相关接口")
+@Api(tags = "教师端项目相关接口")
 @Slf4j
 public class ProjectController {
 

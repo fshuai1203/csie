@@ -7,10 +7,7 @@ import com.fshuai.constant.StatusConstant;
 import com.fshuai.context.TeacherBaseContext;
 import com.fshuai.dto.*;
 import com.fshuai.entity.Teacher;
-import com.fshuai.exception.DeletionNotAllowedException;
-import com.fshuai.exception.LoginFailedException;
-import com.fshuai.exception.RegisterFailedException;
-import com.fshuai.exception.TeacherUpdateFailedException;
+import com.fshuai.exception.*;
 import com.fshuai.mapper.TeacherMapper;
 import com.fshuai.properties.JwtProperties;
 import com.fshuai.result.PageResult;
@@ -124,9 +121,13 @@ public class TeacherServiceImpl implements TeacherService {
             throw new RegisterFailedException(MessageConstant.ROLE_FAILED);
         }
         // 添加校级负责人
-        if (teacherRegisterDTO.getRole() == RoleConstant.SCHOOL_HEAD && teacherRegisterDTO.getDeptId() == 0) {
+        if (teacherRegisterDTO.getRole() == RoleConstant.SCHOOL_HEAD) {
             if (teacherRole == RoleConstant.DEPARTMENT_HEAD) {
                 throw new RegisterFailedException(MessageConstant.ROLE_FAILED);
+            }
+            // 不满足规定，校级负责人role=1，dept=0
+            if (teacherRegisterDTO.getDeptId() != 0) {
+                throw new RegisterFailedException(MessageConstant.REGISTER_FIELD_ILLEGAL);
             }
             teacher.setPassword(bCryptPasswordEncoder.encode(PasswordConstant.SCHOOL_HEAD_DEFAULT_PASSWORD));
         }
@@ -144,6 +145,40 @@ public class TeacherServiceImpl implements TeacherService {
         }
         teacher.setState(StatusConstant.ENABLE);
         teacherMapper.insert(teacher);
+    }
+
+    /**
+     * 初始化系统管理员
+     */
+    @Override
+    public void initAdmin() {
+        Integer count = teacherMapper.selectCount();
+        // 如果当前系统有老师则不能进行初始化
+        if (count != 0) {
+            throw new TeacherProjectException(MessageConstant.SYSTEM_INIT_FAILED);
+        }
+        Teacher teacher = Teacher
+                .builder()
+                .name("管理员")
+                .idNumber("admin")
+                .sex(1)
+                .deptId(0)
+                .majorName("系统管理员")
+                .password(bCryptPasswordEncoder.encode(PasswordConstant.ADMIN_DEFAULT_PASSWORD))
+                .phone("13315927816")
+                .role(RoleConstant.SCHOOL_HEAD)
+                .state(StatusConstant.ENABLE)
+                .build();
+        teacherMapper.insert(teacher);
+    }
+
+    @Override
+    public TeacherVO getByIdNumber(String idNumber) {
+        TeacherVO teacherVO = teacherMapper.selectTeacherVOByIdNumber(idNumber);
+        if (teacherVO == null) {
+            throw new TeacherProjectException(MessageConstant.TEACHER_ID_NUMBER_ERROR);
+        }
+        return teacherVO;
     }
 
     /**
@@ -168,6 +203,9 @@ public class TeacherServiceImpl implements TeacherService {
         // 如果修改字段为空，则不能修改
         if (teacherUpdateDTO.getRole() == null || teacherUpdateDTO.getDeptId() == null) {
             throw new RegisterFailedException(MessageConstant.REGISTER_FIELD_EMPTY);
+        }
+        if (teacherUpdateDTO.getRole() == RoleConstant.SCHOOL_HEAD && teacherUpdateDTO.getDeptId() != 0) {
+            throw new RegisterFailedException(MessageConstant.REGISTER_FIELD_ILLEGAL);
         }
         // 获取当前用户的权限
         Map teacherMap = TeacherBaseContext.getCurrentTeacher();
@@ -257,4 +295,5 @@ public class TeacherServiceImpl implements TeacherService {
         }
         throw new DeletionNotAllowedException(MessageConstant.ROLE_FAILED);
     }
+
 }

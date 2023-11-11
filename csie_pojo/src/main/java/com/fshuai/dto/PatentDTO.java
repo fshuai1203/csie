@@ -14,5 +14,7 @@ class PatentDTO {
     // 专利号
     private String patentNumber;
 
+    private String uri;
+
 }
 

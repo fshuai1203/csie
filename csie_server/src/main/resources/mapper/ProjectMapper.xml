@@ -2,13 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.fshuai.mapper.ProjectMapper">
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO project ( name, category, teacher_id,teacher_name, principal_id,principal_name, mentor_id,
-        begin_time, end_time, description,
-        attachments, type, state, dept_id, number )
-        VALUES
-        (#{name},#{category},#{teacherId},#{teacherName},#{principalId},#{principalName},
-        #{mentorId},#{beginTime},#{endTime},#{description},
-        #{attachments},#{type},#{state},#{deptId},#{number})
+        INSERT INTO project (name, category, teacher_id, teacher_name, principal_id, principal_name, mentor_id,
+                             begin_time, end_time, description,
+                             attachments, type, state, dept_id, number)
+        VALUES (#{name}, #{category}, #{teacherId}, #{teacherName}, #{principalId}, #{principalName},
+                #{mentorId}, #{beginTime}, #{endTime}, #{description},
+                #{attachments}, #{type}, #{state}, #{deptId}, #{number})
     </insert>
     <update id="update">
         update project
@@ -60,35 +59,57 @@
         where id = #{projectId}
     </select>
     <select id="pageQuery" resultType="com.fshuai.vo.ProjectPageVO">
-        select *
-        from project
+        SELECT
+        p.*,
+        t.`name` teacherName,
+        s.`name` principalName,
+        d.`name` deptName
+        FROM
+        project p,
+        teacher t,
+        student s,
+        department d
         <where>
+            p.teacher_id = t.id
+            AND p.dept_id = d.id
+            AND p.principal_id = s.id
             <if test="beginTime != null and beginTime!='' ">
-                and begin_time = #{beginTime}
+                and p.begin_time = #{beginTime}
             </if>
             <if test="name != null and name!='' ">
-                and name = #{name}
+                and p.name = #{name}
             </if>
             <if test="deptId != null">
-                and dept_id=#{deptId}
+                and p.dept_id=#{deptId}
             </if>
             <if test="type != null">
-                and type=#{type}
+                and p.type=#{type}
             </if>
             <if test="state != null">
-                and state=#{state}
+                and p.state=#{state}
             </if>
         </where>
     </select>
     <select id="reviewPageQuery" resultType="com.fshuai.vo.ProjectPageVO">
-        select *
-        from project
+        SELECT
+        p.*,
+        t.`name` teacherName,
+        s.`name` principalName,
+        d.`name` deptName
+        FROM
+        project p,
+        teacher t,
+        student s,
+        department d
         <where>
+            p.teacher_id = t.id
+            AND p.dept_id = d.id
+            AND p.principal_id = s.id
             <if test="deptId != null">
-                and dept_id=#{deptId}
+                and p.dept_id=#{deptId}
             </if>
             <if test="states != null">
-                and state in
+                and p.state in
                 <foreach collection="states" separator="," item="state" open="(" close=")">
                     #{state}
                 </foreach>

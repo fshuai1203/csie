@@ -4,6 +4,7 @@ import com.fshuai.dto.*;
 import com.fshuai.entity.Student;
 import com.fshuai.entity.Teacher;
 import com.fshuai.result.PageResult;
+import com.fshuai.vo.StudentVO;
 
 import java.util.List;
 
@@ -18,4 +19,5 @@ public interface StudentService {
 
     void logout();
 
+    StudentVO getByIdNumber(String idNumber);
 }

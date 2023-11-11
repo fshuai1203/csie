@@ -3,6 +3,7 @@ package com.fshuai.service;
 import com.fshuai.dto.*;
 import com.fshuai.entity.Teacher;
 import com.fshuai.result.PageResult;
+import com.fshuai.vo.TeacherVO;
 
 import java.util.List;
 
@@ -16,4 +17,8 @@ public interface TeacherService {
     PageResult pageQuery(TeacherPageQueryDTO teacherPageQueryDTO);
 
     void deleteBatch(List<Integer> ids);
+
+    void initAdmin();
+
+    TeacherVO getByIdNumber(String idNumber);
 }
